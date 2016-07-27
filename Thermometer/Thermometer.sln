@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Thermometer", "Thermometer.vcxproj", "{2050EAC3-F993-4F91-B191-682CD77EB376}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UV_box_driver", "..\UV_box_driver\UV_box_driver.vcxproj", "{98C79FEB-114A-450E-84DE-57F3E0B2724E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2050EAC3-F993-4F91-B191-682CD77EB376}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2050EAC3-F993-4F91-B191-682CD77EB376}.Debug|Win32.Build.0 = Debug|Win32
+		{2050EAC3-F993-4F91-B191-682CD77EB376}.Release|Win32.ActiveCfg = Release|Win32
+		{2050EAC3-F993-4F91-B191-682CD77EB376}.Release|Win32.Build.0 = Release|Win32
+		{98C79FEB-114A-450E-84DE-57F3E0B2724E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{98C79FEB-114A-450E-84DE-57F3E0B2724E}.Debug|Win32.Build.0 = Debug|Win32
+		{98C79FEB-114A-450E-84DE-57F3E0B2724E}.Release|Win32.ActiveCfg = Release|Win32
+		{98C79FEB-114A-450E-84DE-57F3E0B2724E}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
