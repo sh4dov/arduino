@@ -1,0 +1,23 @@
+C:\Users\sh4dov\AppData\Local\Temp\VMBuilds\CardInfo\uno\Debug\CardInfo.cpp.o: \
+ C:\Users\sh4dov\AppData\Local\Temp\VMBuilds\CardInfo\uno\Debug\CardInfo.cpp \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/arduino.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/binary.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/WCharacter.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/WString.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/HardwareSerial.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/Stream.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/Print.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/Printable.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/USBAPI.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/Arduino.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\variants\standard/pins_arduino.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\libraries\SPI\src/SPI.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/Arduino.h \
+ P:\Programowanie\arduino-1.6.5-r5\libraries\SD\src/SD.h \
+ P:\Programowanie\arduino-1.6.5-r5\libraries\SD\src/utility/SdFat.h \
+ P:\Programowanie\arduino-1.6.5-r5\libraries\SD\src/utility/Sd2Card.h \
+ P:\Programowanie\arduino-1.6.5-r5\libraries\SD\src/utility/Sd2PinMap.h \
+ P:\Programowanie\arduino-1.6.5-r5\libraries\SD\src/utility/SdInfo.h \
+ P:\Programowanie\arduino-1.6.5-r5\libraries\SD\src/utility/FatStructs.h \
+ C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.16\cores\arduino/Print.h \
+ P:\Programowanie\arduino-1.6.5-r5\libraries\SD\src/utility/SdFatUtil.h

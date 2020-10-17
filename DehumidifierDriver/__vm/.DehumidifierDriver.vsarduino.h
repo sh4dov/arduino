@@ -5,17 +5,18 @@
 	        all non-arduino files created by visual micro and all visual studio project or solution files can be freely deleted and are not required to compile a sketch (do not delete your own code!).
 	        note: debugger breakpoints are stored in '.sln' or '.asln' files, knowledge of last uploaded breakpoints is stored in the upload.vmps.xml file. Both files are required to continue a previous debug session without needing to compile and upload again
 	
-	Hardware: Arduino Pro or Pro Mini w/ ATmega328 (5V, 16 MHz), Platform=avr, Package=arduino
+	Hardware: ATtiny13, Platform=avr, Package=diy_attiny
 */
 
 #ifndef _VSARDUINO_H_
 #define _VSARDUINO_H_
-#define __AVR_ATmega328p__
-#define __AVR_ATmega328P__
-#define F_CPU 16000000L
+#define __AVR_ATtiny13__
+#define __AVR_ATTINY13__
+#define F_CPU 9600000L
 #define ARDUINO 10605
-#define ARDUINO_AVR_PRO
+#define ARDUINO_ATTINY13_DIY
 #define ARDUINO_ARCH_AVR
+#define NO_TONE
 #define __cplusplus 201103L
 #define __AVR__
 #define __inline__
@@ -50,5 +51,5 @@ extern "C" void __cxa_pure_virtual() {;}
 #define F(string_literal) ((const PROGMEM char *)(string_literal))
 #undef PSTR
 #define PSTR(string_literal) ((const PROGMEM char *)(string_literal))
-#include "UV_box_driver.ino"
+#include "DehumidifierDriver.ino"
 #endif

@@ -44,10 +44,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\cores\arduino;P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\variants\standard;C:\Users\sh4dov\Documents\Arduino\gas_sensor;P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\libraries\EEPROM;P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\libraries\EEPROM\utility;C:\Users\sh4dov\Documents\Arduino\libraries\pcd8544-1.4.3;C:\Users\sh4dov\Documents\Arduino\libraries\pcd8544-1.4.3\utility;P:\Programowanie\arduino-1.6.5-r5\libraries;P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\libraries;P:\Programowanie\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\vuj4xl2z.rmx\Micro Platforms\default\debuggers;C:\Users\sh4dov\Documents\Arduino\libraries;C:\Users\sh4dov\Documents\Arduino\gas_sensor;P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\cores\arduino;P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\variants\standard;P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\libraries\EEPROM;C:\Users\sh4dov\Documents\Arduino\libraries\pcd8544-1.4.3;P:\Programowanie\arduino-1.6.5-r5\libraries;P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\libraries;P:\Programowanie\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\vuj4xl2z.rmx\Micro Platforms\default\debuggers;C:\Users\sh4dov\Documents\Arduino\libraries;P:\Programowanie\arduino-1.6.5-r5\hardware\tools\avr/avr/include/;P:\Programowanie\arduino-1.6.5-r5\hardware\tools\avr//avr/include/avr/;P:\Programowanie\arduino-1.6.5-r5\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\Programowanie\arduino-1.6.5-r5\hardware\arduino\avr\libraries\EEPROM;C:\Users\sh4dov\Documents\Arduino\libraries\pcd8544-1.4.3;C:\Users\sh4dov\Documents\Arduino\libraries\StandardCplusplus-master;C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.15\libraries\EEPROM\src;C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.15\libraries\EEPROM\src\utility;C:\Users\sh4dov\Documents\Arduino\libraries\pcd8544-1.4.3\utility;C:\Users\sh4dov\Documents\Arduino\libraries\StandardCplusplus-master\utility;P:\Programowanie\arduino-1.6.5-r5\libraries;C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.15\libraries;C:\Users\sh4dov\Documents\Arduino\libraries;C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.15\cores\arduino;C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.15\variants\standard;C:\Users\sh4dov\Documents\Arduino\gas_sensor;C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.3-arduino2/avr/include/;C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.3-arduino2//avr/include/avr/;C:\Users\sh4dov\AppData\Roaming\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.3-arduino2/lib\gcc\avr\4.8.1\include;C:\Users\sh4dov\Documents\Arduino\libs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>C:\Users\sh4dov\Documents\Arduino\gas_sensor\__vm\.gas_sensor.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;F_CPU=16000000L;ARDUINO=165;ARDUINO_AVR_UNO;ARDUINO_ARCH_AVR;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;F_CPU=16000000L;ARDUINO=10605;ARDUINO_AVR_UNO;ARDUINO_ARCH_AVR;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -73,9 +73,34 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\libs\DataStorage.h" />
+    <ClInclude Include="..\libs\IAction.h" />
+    <ClInclude Include="..\libs\ISaveable.h" />
+    <ClInclude Include="..\libs\Keyboard.h" />
+    <ClInclude Include="..\libs\Menu.h" />
+    <ClInclude Include="..\libs\MenuAction.h" />
+    <ClInclude Include="..\libs\SetIntAction.h" />
+    <ClInclude Include="..\libs\SetTimerAction.h" />
+    <ClInclude Include="CalibrationAction.h" />
+    <ClInclude Include="SensorAction.h" />
     <ClInclude Include="__vm\.gas_sensor.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\libs\DataStorage.cpp" />
+    <ClCompile Include="..\libs\Keyboard.cpp" />
+    <ClCompile Include="..\libs\Menu.cpp" />
+    <ClCompile Include="..\libs\MenuAction.cpp" />
+    <ClCompile Include="..\libs\SetIntAction.cpp" />
+    <ClCompile Include="..\libs\SetTimerAction.cpp" />
+    <ClCompile Include="CalibrationAction.cpp" />
+    <ClCompile Include="SensorAction.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties vm.upload.useprogrammer="1" arduino.upload.port="COM3" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
