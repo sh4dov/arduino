@@ -1,3 +1,5 @@
+#pragma once
+
 const char htmlsrc1[] =
     R"=====(
 <html>
