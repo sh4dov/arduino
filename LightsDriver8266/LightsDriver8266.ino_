@@ -40,7 +40,7 @@ int autoState[] = {0, 0, 0, 1};
 
 String names[] = {"Oswietlenie gorne", "Oswietlenie szafek", "Oswietlenie blat", "Oswietlenie podloga"};
 
-//LightsDriver ld(ip);
+LightsDriver ld(ip, ssid, password, leds, names, "LightsDriverKuchnia");
 
 void setup(void)
 {
