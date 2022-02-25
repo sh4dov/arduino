@@ -1,16 +1,17 @@
 #include "LightsDriver.h"
 
 LightsDriver::LightsDriver(IPAddress &ip,
-                           char *ssid,
-                           char *pwd,
-                           int *leds,
+                           const char *ssid,
+                           const char *pwd,
+                           int leds[],
+                           byte ledsCount,
                            String *names,
-                           char *instanceName) : server(80),
-                                                 gateway(192, 168, 100, 1),
-                                                 subnet(255, 255, 255, 0),
-                                                 dns1(192, 168, 100, 1),
-                                                 dns2(8, 8, 8, 8),
-                                                 timeClient(ntpUDP, "pool.ntp.org", 3600)
+                           const char *instanceName) : server(80),
+                                                       gateway(192, 168, 100, 1),
+                                                       subnet(255, 255, 255, 0),
+                                                       dns1(192, 168, 100, 1),
+                                                       dns2(8, 8, 8, 8),
+                                                       timeClient(ntpUDP, "pool.ntp.org", 3600)
 {
     this->ip = ip;
     this->ssid = ssid;
@@ -18,6 +19,7 @@ LightsDriver::LightsDriver(IPAddress &ip,
     this->leds = leds;
     this->names = names;
     this->instanceName = instanceName;
+    this->ledsCount = ledsCount;
 }
 
 void LightsDriver::begin()
@@ -30,6 +32,7 @@ void LightsDriver::begin()
     pinMode(this->autoPin, INPUT);
 
     Serial.begin(115200);
+
     WiFi.mode(WIFI_STA);
     WiFi.config(this->ip, this->gateway, this->subnet, this->dns1, this->dns2);
     WiFi.begin(this->ssid, this->pwd);
@@ -95,6 +98,14 @@ void LightsDriver::begin()
     Serial.println(ssid);
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
+
+    Serial.println("led pins: ");
+    for (int i = 0; i < this->getNumberOfLeds(); i++)
+    {
+        Serial.print(this->leds[i]);
+        Serial.print(" - ");
+        Serial.println(this->names[i]);
+    }
 
     if (MDNS.begin("esp8266"))
     {
@@ -275,7 +286,7 @@ String LightsDriver::generateLedHtml(int n)
 
 byte LightsDriver::getNumberOfLeds()
 {
-    return sizeof(this->leds) / sizeof(this->leds[0]);
+    return this->ledsCount;
 }
 
 void LightsDriver::handleRoot()

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LIGHTSDRIVER_H
+#define LIGHTSDRIVER_H
 
 #include <NTPClient.h>
 #include <ESP8266WiFi.h>
@@ -20,8 +21,8 @@ private:
     IPAddress subnet;
     IPAddress dns1;
     IPAddress dns2;
-    char *ssid;
-    char *pwd;
+    const char *ssid;
+    const char *pwd;
     WiFiEventHandler wifiDisconnectHandler;
     WiFiUDP ntpUDP;
     NTPClient timeClient;
@@ -37,7 +38,8 @@ private:
     int state[4] = {0, 0, 0, 0};
     int autoState[4] = {0, 0, 0, 0};
     String *names;
-    String instanceName;
+    const char *instanceName;
+    byte ledsCount;
 
     void handleTimeEvents();
     bool isDarkTime();
@@ -60,7 +62,9 @@ private:
     void handleLed();
 
 public:
-    LightsDriver(IPAddress &ip, char *ssid, char *pwd, int *leds, String *names, char *instanceName);
+    LightsDriver(IPAddress &ip, const char *ssid, const char *pwd, int leds[], byte ledsCount, String *names, const char *instanceName);
     void begin();
     void handle();
 };
+
+#endif
