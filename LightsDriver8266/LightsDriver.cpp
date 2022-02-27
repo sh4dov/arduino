@@ -239,7 +239,7 @@ void LightsDriver::handleTimeEvents()
 
 bool LightsDriver::isDarkTime()
 {
-    if ((this->timeClient.getHours() > 15 || this->timeClient.getHours() < 7))
+    if ((this->timeClient.getHours() >= 15 || this->timeClient.getHours() <= 7))
     {
         return true;
     }
