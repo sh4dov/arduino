@@ -140,14 +140,24 @@ const char htmlsrc1[] =
         h1 {
             font-size: 4em;
         }
+
+        .number {
+            height: 50px;
+            font-size: 3em;
+        }
+
+        .settings {
+            margin-top: 3em;
+        }
     </style>
 </head>
 <body>
 )=====";
 
 const char htmlsrc2[] =
-    R"=====(
-    <input class="btn" type="button" value="SAVE" onclick="save()">
+    R"=====(    
+        <input class="btn" type="button" value="SAVE" onclick="save()">
+    </section>
 
     <script>
         function turnOnOff(id, on) {
@@ -173,9 +183,14 @@ const char htmlsrc2[] =
         }
 
         function save() {
+            const from = document.querySelector('input[id="from"]');
+            const to = document.querySelector('input[id="to"]');
+            const data = { from: from.value, to: to.value };
+
             fetch("/save", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
             });
         }
 

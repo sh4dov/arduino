@@ -136,6 +136,15 @@
         h1 {
             font-size: 4em;
         }
+
+        .number {
+            height: 50px;
+            font-size: 3em;
+        }
+
+        .settings {
+            margin-top: 3em;
+        }
     </style>
 </head>
 
@@ -162,7 +171,12 @@
     <input class="btn" type="button" value="ON" onclick="turnOnOff(5, true)">
     <input class="range" type="range" value="0" min="0" max="255" oninput="changeBrightness(5, this.value)">
 
-    <input class="btn" type="button" value="SAVE" onclick="save()">
+    <section class="settings">
+        <span class="label">Auto off time: </span><input class="number" type="number" min="0" max="23" value="7"
+            id="from"><span class="label"> - </span>
+        <input class="number" type="number" min="0" max="23" value="15" id="to">
+        <input class="btn" type="button" value="SAVE" onclick="save()">
+    </section>
 
     <script>
         function turnOnOff(id, on) {
@@ -186,9 +200,14 @@
         }
 
         function save() {
+            const from = document.querySelector('input[id="from"]');
+            const to = document.querySelector('input[id="to"]');
+            const data = { from: from.value, to: to.value };
+
             fetch("/save", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
             });
         }
 

@@ -26,9 +26,7 @@ private:
     WiFiEventHandler wifiDisconnectHandler;
     WiFiUDP ntpUDP;
     NTPClient timeClient;
-    int autoPin = 12;
-    int autoVal = 0;
-    int lastAutoVal = 0;
+    int autoVal[4] = {0, 0, 0, 0};
     unsigned long timeout = 0;
     unsigned long nextRead = 0;
     int timer = 0;
@@ -40,11 +38,14 @@ private:
     String *names;
     const char *instanceName;
     byte ledsCount;
+    int *detectors;
+    byte detectorsCount;
+    int from = 7;
+    int to = 15;
 
     void handleTimeEvents();
     bool isDarkTime();
     void getTime();
-    byte getNumberOfLeds();
     String generateLedHtml(int n);
     void handleRoot();
     void handleNotFound();
@@ -60,9 +61,10 @@ private:
     void handleBrightness();
     void handleAuto();
     void handleLed();
+    int getMaxAutoVal();
 
 public:
-    LightsDriver(IPAddress &ip, const char *ssid, const char *pwd, int leds[], byte ledsCount, String *names, const char *instanceName);
+    LightsDriver(IPAddress &ip, const char *ssid, const char *pwd, int leds[], byte ledsCount, int detectors[], byte detectorsCount, String *names, const char *instanceName);
     void begin();
     void handle();
 };

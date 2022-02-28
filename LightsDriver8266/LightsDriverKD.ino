@@ -12,10 +12,11 @@
 
 IPAddress ip(192, 168, 100, 33);
 int leds[] = {5, 4};
+int detectors[] = {12};
 String names[] = {"Plafon", "Glowne"};
 const char *instance = "LightsDriverKD";
 
-LightsDriver ld(ip, ssid, password, leds, sizeof(leds) / sizeof(leds[0]), names, instance);
+LightsDriver ld(ip, ssid, password, leds, sizeof(leds) / sizeof(leds[0]), detectors, sizeof(detectors) / sizeof(detectors[0]), names, instance);
 
 void setup(void)
 {

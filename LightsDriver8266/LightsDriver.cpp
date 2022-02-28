@@ -5,6 +5,8 @@ LightsDriver::LightsDriver(IPAddress &ip,
                            const char *pwd,
                            int leds[],
                            byte ledsCount,
+                           int detectors[],
+                           byte detectorsCount,
                            String *names,
                            const char *instanceName) : server(80),
                                                        gateway(192, 168, 100, 1),
@@ -20,16 +22,21 @@ LightsDriver::LightsDriver(IPAddress &ip,
     this->names = names;
     this->instanceName = instanceName;
     this->ledsCount = ledsCount;
+    this->detectors = detectors;
+    this->detectorsCount = detectorsCount;
 }
 
 void LightsDriver::begin()
 {
-    for (byte i = 0; i < this->getNumberOfLeds(); i++)
+    for (byte i = 0; i < this->ledsCount; i++)
     {
         analogWrite(this->leds[i], 0);
     }
 
-    pinMode(this->autoPin, INPUT);
+    for (byte i = 0; i < this->detectorsCount; i++)
+    {
+        pinMode(this->detectors[i], INPUT);
+    }
 
     Serial.begin(115200);
 
@@ -100,7 +107,7 @@ void LightsDriver::begin()
     Serial.println(WiFi.localIP());
 
     Serial.println("led pins: ");
-    for (int i = 0; i < this->getNumberOfLeds(); i++)
+    for (int i = 0; i < this->ledsCount; i++)
     {
         Serial.print(this->leds[i]);
         Serial.print(" - ");
@@ -135,7 +142,7 @@ void LightsDriver::begin()
             DynamicJsonDocument doc(200);
             deserializeJson(doc, cfg);
             JsonArray arr = doc.as<JsonArray>();
-            for (int i = 0; i < getNumberOfLeds(); i++)
+            for (int i = 0; i < this->ledsCount; i++)
             {
                 this->vals[i] = arr[i].as<int>();
             }
@@ -151,10 +158,25 @@ void LightsDriver::begin()
             DynamicJsonDocument doc(200);
             deserializeJson(doc, cfg);
             JsonArray arr = doc.as<JsonArray>();
-            for (int i = 0; i < getNumberOfLeds(); i++)
+            for (int i = 0; i < this->ledsCount; i++)
             {
                 this->autoState[i] = arr[i].as<int>();
             }
+            cfg.close();
+
+            Serial.println("Configuration loaded");
+        }
+
+        cfg = SPIFFS.open("/time.json", "r");
+        if (cfg)
+        {
+            Serial.println("Opened file");
+            DynamicJsonDocument doc(200);
+            deserializeJson(doc, cfg);
+            JsonArray arr = doc.as<JsonArray>();
+            this->from = arr[0].as<int>();
+            this->to = arr[1].as<int>();
+
             cfg.close();
 
             Serial.println("Configuration loaded");
@@ -163,7 +185,8 @@ void LightsDriver::begin()
 
     ArduinoOTA.setHostname("LightsDriverKuchnia");
 
-    ArduinoOTA.onStart([]() {
+    ArduinoOTA.onStart([]()
+                       {
         String type;
         if (ArduinoOTA.getCommand() == U_FLASH)
             type = "sketch";
@@ -171,15 +194,13 @@ void LightsDriver::begin()
             type = "filesystem";
 
         // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-        Serial.println("Start updating " + type);
-    });
-    ArduinoOTA.onEnd([]() {
-        Serial.println("\nEnd");
-    });
-    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-        Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-    });
-    ArduinoOTA.onError([](ota_error_t error) {
+        Serial.println("Start updating " + type); });
+    ArduinoOTA.onEnd([]()
+                     { Serial.println("\nEnd"); });
+    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
+                          { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); });
+    ArduinoOTA.onError([](ota_error_t error)
+                       {
         Serial.printf("Error[%u]: ", error);
         if (error == OTA_AUTH_ERROR)
             Serial.println("Auth Failed");
@@ -190,8 +211,7 @@ void LightsDriver::begin()
         else if (error == OTA_RECEIVE_ERROR)
             Serial.println("Receive Failed");
         else if (error == OTA_END_ERROR)
-            Serial.println("End Failed");
-    });
+            Serial.println("End Failed"); });
     ArduinoOTA.begin();
 
     Serial.println("Waiting for communication");
@@ -225,8 +245,10 @@ void LightsDriver::handleTimeEvents()
 
         if (this->timer % 5 == 0)
         {
-            this->lastAutoVal = this->autoVal;
-            this->autoVal = digitalRead(this->autoPin);
+            for (byte i = 0; i < this->detectorsCount; i++)
+            {
+                this->autoVal[i] = digitalRead(this->detectors[i]);
+            }
             this->serveAuto();
         }
 
@@ -239,7 +261,7 @@ void LightsDriver::handleTimeEvents()
 
 bool LightsDriver::isDarkTime()
 {
-    if ((this->timeClient.getHours() >= 15 || this->timeClient.getHours() <= 7))
+    if ((this->timeClient.getHours() >= this->to || this->timeClient.getHours() <= this->from))
     {
         return true;
     }
@@ -284,19 +306,21 @@ String LightsDriver::generateLedHtml(int n)
     return src;
 }
 
-byte LightsDriver::getNumberOfLeds()
-{
-    return this->ledsCount;
-}
-
 void LightsDriver::handleRoot()
 {
     String src = htmlsrc1;
 
-    for (int i = 0; i < this->getNumberOfLeds(); i++)
+    for (int i = 0; i < this->ledsCount; i++)
     {
         src += this->generateLedHtml(i);
     }
+
+    src += "<section class=\"settings\">";
+    src += "    <span class=\"label\">Auto off time: </span><input class=\"number\" type=\"number\" min=\"0\" max=\"23\" value=\"";
+    src += String(this->from);
+    src += "\" id=\"from\"><span class=\"label\"> - </span> <input class=\"number\" type=\"number\" min=\"0\" max=\"23\" value=\"";
+    src += String(this->to);
+    src += "\" id=\"to\">";
 
     src += htmlsrc2;
 
@@ -329,6 +353,20 @@ void LightsDriver::onWifiDisconnect(const WiFiEventStationModeDisconnected &even
     WiFi.begin(this->ssid, this->pwd);
 }
 
+int LightsDriver::getMaxAutoVal()
+{
+    int result = 0;
+    for (byte i = 0; i < this->detectorsCount; i++)
+    {
+        if (this->autoVal[i] > result)
+        {
+            result = this->autoVal[i];
+        }
+    }
+
+    return result;
+}
+
 void LightsDriver::serveAuto()
 {
     if (this->isAutoEnabled() == 0)
@@ -337,7 +375,8 @@ void LightsDriver::serveAuto()
     }
 
     unsigned long now = millis();
-    if (this->timeout == 0 && this->autoVal > 0 && this->isDarkTime())
+    int autoVal = this->getMaxAutoVal();
+    if (this->timeout == 0 && autoVal > 0 && this->isDarkTime())
     {
         this->timeout = now + 60000; // 60s
         Serial.println("auto started");
@@ -347,7 +386,7 @@ void LightsDriver::serveAuto()
         return;
     }
 
-    if (this->timeout < now && this->timeout > 0 && this->autoVal == 0)
+    if (this->timeout<now &&this->timeout> 0 && autoVal == 0)
     {
         Serial.println("auto stopped");
         Serial.println(this->timeout);
@@ -357,7 +396,7 @@ void LightsDriver::serveAuto()
         return;
     }
 
-    if (this->autoVal > 0 && this->isDarkTime())
+    if (autoVal > 0 && this->isDarkTime())
     {
         Serial.println("auto extending");
         this->timeout = now + 60000;
@@ -366,7 +405,7 @@ void LightsDriver::serveAuto()
 
 void LightsDriver::changeAutoLed(int enabled)
 {
-    for (int i = 0; i < this->getNumberOfLeds(); i++)
+    for (int i = 0; i < this->ledsCount; i++)
     {
         if (this->autoState[i] > 0)
         {
@@ -378,7 +417,7 @@ void LightsDriver::changeAutoLed(int enabled)
 
 int LightsDriver::isAutoEnabled()
 {
-    for (int i = 0; i < this->getNumberOfLeds(); i++)
+    for (int i = 0; i < this->ledsCount; i++)
     {
         if (this->autoState[i] > 0)
         {
@@ -411,7 +450,7 @@ void LightsDriver::handleSaveAuto()
     {
         DynamicJsonDocument doc(200);
         JsonArray arr = doc.to<JsonArray>();
-        for (int i = 0; i < this->getNumberOfLeds(); i++)
+        for (int i = 0; i < this->ledsCount; i++)
         {
             arr.add(this->autoState[i]);
         }
@@ -433,12 +472,31 @@ void LightsDriver::handleSaveAuto()
 
 void LightsDriver::handleSave()
 {
-    File cfg = SPIFFS.open("/vals.json", "w");
+    DynamicJsonDocument doc(200);
+    deserializeJson(doc, this->server.arg("plain"));
+    int from = doc["from"];
+    int to = doc["to"];
+    this->from = from;
+    this->to = to;
+
+    File cfg = SPIFFS.open("/time.json", "w");
     if (cfg)
     {
         DynamicJsonDocument doc(200);
         JsonArray arr = doc.to<JsonArray>();
-        for (int i = 0; i < this->getNumberOfLeds(); i++)
+        arr.add(from);
+        arr.add(to);
+
+        serializeJson(doc, cfg);
+        cfg.close();
+    }
+
+    cfg = SPIFFS.open("/vals.json", "w");
+    if (cfg)
+    {
+        DynamicJsonDocument doc(200);
+        JsonArray arr = doc.to<JsonArray>();
+        for (int i = 0; i < this->ledsCount; i++)
         {
             arr.add(this->vals[i]);
         }
