@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
     RouterModule.forRoot([
       { path: '', component: LightDriverListComponent },
       { path: 'drivers/:id', component: DriverDetailsComponent }
-    ])
+    ], { useHash: true })
   ],
   declarations: [
     AppComponent,
