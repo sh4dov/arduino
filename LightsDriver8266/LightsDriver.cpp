@@ -127,6 +127,17 @@ void LightsDriver::begin()
     this->server.on("/ota", std::bind(&LightsDriver::handleOTA, this));
     this->server.on("/reset", std::bind(&LightsDriver::handleReset, this));
     this->server.on("/auto", HTTP_POST, std::bind(&LightsDriver::handleAuto, this));
+    this->server.on("/conf", std::bind(&LightsDriver::handleConf, this));
+
+    this->server.on("/led", HTTP_OPTIONS, std::bind(&LightsDriver::handleOptions, this));
+    this->server.on("/onoff", HTTP_OPTIONS, std::bind(&LightsDriver::handleOptions, this));
+    this->server.on("/brightness", HTTP_OPTIONS, std::bind(&LightsDriver::handleOptions, this));
+    this->server.on("/save", HTTP_OPTIONS, std::bind(&LightsDriver::handleOptions, this));
+    this->server.on("/ota", HTTP_OPTIONS, std::bind(&LightsDriver::handleOptions, this));
+    this->server.on("/reset", HTTP_OPTIONS, std::bind(&LightsDriver::handleOptions, this));
+    this->server.on("/auto", HTTP_OPTIONS, std::bind(&LightsDriver::handleOptions, this));
+    this->server.on("/conf", HTTP_OPTIONS, std::bind(&LightsDriver::handleOptions, this));
+
     this->server.onNotFound(std::bind(&LightsDriver::handleNotFound, this));
     this->server.begin();
     Serial.println("HTTP server started");
@@ -343,6 +354,7 @@ void LightsDriver::handleNotFound()
         message += " " + this->server.argName(i) + ": " + this->server.arg(i) + "\n";
     }
 
+    this->addCORSHeaders();
     this->server.send(404, "text/plain", message);
 }
 
@@ -440,12 +452,15 @@ void LightsDriver::handleOTA()
 
     Serial.println("OTA enabled");
 
+    this->addCORSHeaders();
     this->server.send(200, "text/plain", "OTA enabled");
 }
 
 void LightsDriver::handleSaveAuto()
 {
     File cfg = SPIFFS.open("/autoState.json", "w");
+    this->addCORSHeaders();
+
     if (cfg)
     {
         DynamicJsonDocument doc(200);
@@ -478,6 +493,8 @@ void LightsDriver::handleSave()
     int to = doc["to"];
     this->from = from;
     this->to = to;
+
+    this->addCORSHeaders();
 
     File cfg = SPIFFS.open("/time.json", "w");
     if (cfg)
@@ -535,8 +552,15 @@ void LightsDriver::handleOnOff()
     Serial.print(" value: ");
     Serial.println(val);
 
-    this->server.sendHeader("location", "/");
-    this->server.send(303);
+    this->addCORSHeaders();
+    if (this->server.hasArg("local"))
+    {
+        this->server.sendHeader("location", "/");
+        this->server.send(303);
+        return;
+    }
+
+    this->server.send(200);
 }
 
 void LightsDriver::handleBrightness()
@@ -555,8 +579,15 @@ void LightsDriver::handleBrightness()
     Serial.print(" value: ");
     Serial.println(val);
 
-    this->server.sendHeader("location", "/");
-    this->server.send(303);
+    this->addCORSHeaders();
+    if (this->server.hasArg("local"))
+    {
+        this->server.sendHeader("location", "/");
+        this->server.send(303);
+        return;
+    }
+
+    this->server.send(200);
 }
 
 void LightsDriver::handleAuto()
@@ -570,8 +601,15 @@ void LightsDriver::handleAuto()
 
     this->handleSaveAuto();
 
-    this->server.sendHeader("location", "/");
-    this->server.send(303);
+    this->addCORSHeaders();
+    if (this->server.hasArg("local"))
+    {
+        this->server.sendHeader("location", "/");
+        this->server.send(303);
+        return;
+    }
+
+    return this->server.send(200);
 }
 
 void LightsDriver::handleLed()
@@ -591,6 +629,48 @@ void LightsDriver::handleLed()
     Serial.print("value: ");
     Serial.println(this->server.arg("val"));
 
-    this->server.sendHeader("location", "/");
-    this->server.send(303);
+    this->addCORSHeaders();
+    if (this->server.hasArg("local"))
+    {
+        this->server.sendHeader("location", "/");
+        this->server.send(303);
+        return;
+    }
+
+    this->server.send(200);
+}
+
+void LightsDriver::handleConf()
+{
+    DynamicJsonDocument doc(400);
+    JsonObject obj = doc.to<JsonObject>();
+    String result;
+    obj["from"] = this->from;
+    obj["to"] = this->to;
+    JsonArray arr = doc.createNestedArray("lights");
+    for (byte i = 0; i < this->ledsCount; i++)
+    {
+        obj = arr.createNestedObject();
+        obj["auto"] = this->autoState[i] > 0 ? true : false;
+        obj["brightness"] = this->vals[i];
+        obj["on"] = this->state[i];
+    }
+
+    serializeJsonPretty(doc, result);
+
+    this->addCORSHeaders();
+    this->server.send(200, "text/plain", result);
+}
+
+void LightsDriver::addCORSHeaders()
+{
+    this->server.sendHeader("Access-Control-Allow-Origin", "*");
+    this->server.sendHeader("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS");
+    this->server.sendHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+}
+
+void LightsDriver::handleOptions()
+{
+    this->addCORSHeaders();
+    this->server.send(200);
 }

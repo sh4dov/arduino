@@ -62,6 +62,9 @@ private:
     void handleAuto();
     void handleLed();
     int getMaxAutoVal();
+    void handleConf();
+    void addCORSHeaders();
+    void handleOptions();
 
 public:
     LightsDriver(IPAddress &ip, const char *ssid, const char *pwd, int leds[], byte ledsCount, int detectors[], byte detectorsCount, String *names, const char *instanceName);

@@ -161,31 +161,29 @@ const char htmlsrc2[] =
 
     <script>
         function turnOnOff(id, on) {
-            const data = { id: id, value: on };
+            const data = { id: id, value: !!on, local: true };
 
             fetch("/onoff", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
-            })
-			.then(_ => window.location.reload(true));
+            });
         }
 
         function changeBrightness(id, value) {
-            const data = { id: id, value: value };
+            const data = { id: id, value: value, local: true };
 
             fetch("/brightness", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
-            })
-			.then(_ => window.location.reload(true));
+            });
         }
 
         function save() {
             const from = document.querySelector('input[id="from"]');
             const to = document.querySelector('input[id="to"]');
-            const data = { from: from.value, to: to.value };
+            const data = { from: from.value, to: to.value, local: true };
 
             fetch("/save", {
                 method: "POST",
@@ -198,7 +196,7 @@ const char htmlsrc2[] =
 
         function changeAuto(id) {
             var checked = checkboxes[id - 1].checked;
-            const data = { id: id, value: checked ? 1 : 0 };
+            const data = { id: id, value: checked ? 1 : 0, local: true };
 
             fetch("/auto", {
                 method: "POST",
