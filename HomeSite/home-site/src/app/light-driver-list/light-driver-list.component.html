@@ -1,0 +1,3 @@
+<h2>Lights:</h2>
+<a *ngFor="let driver of drivers; let i = index" [routerLink]="['/drivers', i]"
+    [ngClass]="{'offline': !driver.online}">{{driver.name}}</a>

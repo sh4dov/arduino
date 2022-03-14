@@ -1,0 +1,22 @@
+<a class="back-btn" [routerLink]="['/']">Back</a>
+
+<section *ngIf="driver">
+    <h2 [ngClass]="{'offline': !driver.online}">{{driver.name}}</h2>
+
+    <div *ngFor="let light of driver.lights">
+        <h3>{{light.name}}</h3>
+        <button (click)="changeState(light)">{{ light.on ? 'off' : 'on' }}</button>
+        <input type="range" min="0" max="255" [(ngModel)]="light.brightness" (input)="changeBrightness(light)">
+        <input type="checkbox" (change)="changeAuto(light)" id="chx_{{light.id}}" [(ngModel)]="light.auto"><label
+            for="chx_{{light.id}}">Auto</label>
+    </div>
+
+    <div class="auto-off">
+        <span>Auto off time:</span>
+        <input type="number" min="0" max="23" [(ngModel)]="driver.from">
+        <input type="number" min="0" max="23" [(ngModel)]="driver.to">
+    </div>
+    <button (click)="saveSettings()">Save</button>
+
+    <a class="back-btn" [routerLink]="['/']">Back</a>
+</section>
