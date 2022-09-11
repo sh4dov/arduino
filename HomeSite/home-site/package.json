@@ -20,6 +20,8 @@
     "@angular/router": "~13.2.0",
     "classlist.js": "^1.1.20150312",
     "core-js": "^3.20.3",
+    "core-js-bundle": "^3.21.1",
+    "core-js-pure": "^3.21.1",
     "rxjs": "~7.5.0",
     "systemjs": "^6.12.1",
     "tslib": "^2.3.0",

@@ -30,7 +30,7 @@ void LightsDriver::begin()
 {
     for (byte i = 0; i < this->ledsCount; i++)
     {
-        analogWrite(this->leds[i], 0);
+        analogWrite(this->leds[i], 100);
     }
 
     for (byte i = 0; i < this->detectorsCount; i++)
@@ -99,16 +99,19 @@ void LightsDriver::begin()
     }
 
     this->wifiDisconnectHandler = WiFi.onStationModeDisconnected(std::bind(&LightsDriver::onWifiDisconnect, this, std::placeholders::_1));
+    this->wifiConnectedHandler = WiFi.onStationModeConnected(std::bind(&LightsDriver::onWifiConnected, this, std::placeholders::_1));
 
     Serial.println("");
     Serial.print("Connected to ");
     Serial.println(ssid);
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
+    this->isConnected = true;
 
     Serial.println("led pins: ");
     for (int i = 0; i < this->ledsCount; i++)
     {
+        analogWrite(this->leds[i], 0);
         Serial.print(this->leds[i]);
         Serial.print(" - ");
         Serial.println(this->names[i]);
@@ -272,7 +275,7 @@ void LightsDriver::handleTimeEvents()
 
 bool LightsDriver::isDarkTime()
 {
-    if ((this->timeClient.getHours() >= this->to || this->timeClient.getHours() <= this->from))
+    if (!this->isConnected || (this->timeClient.getHours() >= this->to || this->timeClient.getHours() <= this->from))
     {
         return true;
     }
@@ -360,9 +363,15 @@ void LightsDriver::handleNotFound()
 
 void LightsDriver::onWifiDisconnect(const WiFiEventStationModeDisconnected &event)
 {
+    this->isConnected = false;
     Serial.println("Disconnected from Wi-Fi, trying to connect...");
     WiFi.disconnect();
     WiFi.begin(this->ssid, this->pwd);
+}
+
+void LightsDriver::onWifiConnected(const WiFiEventStationModeConnected &event)
+{
+    this->isConnected = true;
 }
 
 int LightsDriver::getMaxAutoVal()

@@ -24,6 +24,7 @@ private:
     const char *ssid;
     const char *pwd;
     WiFiEventHandler wifiDisconnectHandler;
+    WiFiEventHandler wifiConnectedHandler;
     WiFiUDP ntpUDP;
     NTPClient timeClient;
     int autoVal[4] = {0, 0, 0, 0};
@@ -42,6 +43,7 @@ private:
     byte detectorsCount;
     int from = 7;
     int to = 15;
+    bool isConnected = false;
 
     void handleTimeEvents();
     bool isDarkTime();
@@ -50,6 +52,7 @@ private:
     void handleRoot();
     void handleNotFound();
     void onWifiDisconnect(const WiFiEventStationModeDisconnected &event);
+    void onWifiConnected(const WiFiEventStationModeConnected &event);
     void serveAuto();
     void changeAutoLed(int enabled);
     int isAutoEnabled();
