@@ -173,6 +173,7 @@ void ESBDriver::handleParams()
     String result = Serial.readString();
     result.remove(0, 1);
 
+    this->addCORSHeaders();
     this->server.send(200, "text/plain", result);
 }
 
@@ -238,6 +239,7 @@ void ESBDriver::handleStats()
     String dayConsumption = Serial.readString();
     dayConsumption.remove(0, 1);
 
+    this->addCORSHeaders();
     this->server.send(200, "text/plain", yearConsumption + "." + monthConsumption + "." + dayConsumption);
 }
 

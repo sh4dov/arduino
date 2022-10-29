@@ -1,3 +1,18 @@
 <h2>Lights:</h2>
 <a *ngFor="let driver of drivers; let i = index" [routerLink]="['/drivers', i]"
     [ngClass]="{'offline': !driver.online}">{{driver.name}}</a>
+<h2>ESB</h2>
+<div class="prod">
+  <div>Production:</div>
+  <div>Year {{esb.year}}</div>
+  <div>Month {{esb.month}}</div>
+  <div>Day {{esb.day}}</div>
+  <div>PV {{esb.params[13]}} V {{esb.params[12]}} A {{esb.params[19]}} W</div>
+  <div>ACU {{esb.params[8]}} V Charging {{esb.params[9]}} V Discharge {{esb.params[15]}}V</div>
+  <div>Load {{esb.params[6]}}% SoC {{esb.params[10]}}%</div>
+  <div>AC     {{esb.params[0]}} V {{esb.params[1]}} Hz</div>
+  <div>AC out {{esb.params[2]}} V {{esb.params[3]}} Hz</div>
+  <div>Moc pozorna {{esb.params[4]}} W aktywna {{esb.params[5]}} W</div>
+  <div>Temp {{esb.params[11]}} *C</div>
+  <div>V_BUS {{esb.params[7]}} V</div>
+</div>

@@ -1,5 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, Input } from '@angular/core';
 import { Driver, drivers } from '../driver';
+import { ESBData } from '../ESBData';
 
 @Component({
   selector: 'app-light-driver-list',
@@ -8,10 +10,38 @@ import { Driver, drivers } from '../driver';
 })
 export class LightDriverListComponent implements OnInit {
   drivers: Driver[] = drivers;
+  esb: ESBData = {
+    day:"",
+    month:"",
+    year:"",
+    params: []
+  };
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
+    this.getESBData();
   }
 
+  getESBData() {
+    fetch("http://192.168.100.49/stats", {
+      method: "GET"
+    }).then(r => r.text())
+    .then(data => {
+      const year = +data.substring(0, 8);
+      const month = +data.substring(12, 20);
+      const day = +data.substring(24, 32);
+      this.esb.year = year > 1000 ? year / 1000 + " kW" : year + " W";
+      this.esb.month = month > 1000 ? month / 1000 + " kW" : month + " W";
+      this.esb.day = day > 1000 ? day / 1000 + " kW" : day + " W";
+    })
+    .then(() => fetch("http://192.168.100.49/params"))
+    .then(r => r.text())
+    .then(data => {
+      this.esb.params = data.split(' ');
+    })
+    .finally(() => {
+      setTimeout(() => this.getESBData(), 10000);
+    });
+  }
 }
