@@ -1,0 +1,5 @@
+{
+    "board": "esp8266:esp8266:huzzah",
+    "port": "COM4",
+    "sketch": "8266ntc.ino"
+}
