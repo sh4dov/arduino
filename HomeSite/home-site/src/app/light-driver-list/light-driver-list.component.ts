@@ -28,9 +28,10 @@ export class LightDriverListComponent implements OnInit {
       method: "GET"
     }).then(r => r.text())
     .then(data => {
-      const year = +data.substring(0, 8);
-      const month = +data.substring(12, 20);
-      const day = +data.substring(24, 32);
+      const arr = data.split(".");
+      const year = +arr[0].substring(0, 8);
+      const month = +arr[1].substring(0, 8);
+      const day = +arr[2].substring(0, 8);
       this.esb.year = year > 1000 ? year / 1000 + " kW" : year + " W";
       this.esb.month = month > 1000 ? month / 1000 + " kW" : month + " W";
       this.esb.day = day > 1000 ? day / 1000 + " kW" : day + " W";
