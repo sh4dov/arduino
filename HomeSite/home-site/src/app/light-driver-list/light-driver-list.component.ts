@@ -14,6 +14,7 @@ export class LightDriverListComponent implements OnInit {
     day:"",
     month:"",
     year:"",
+    total:"",
     params: []
   };
 
@@ -32,9 +33,11 @@ export class LightDriverListComponent implements OnInit {
       const year = +arr[0].substring(0, 8);
       const month = +arr[1].substring(0, 8);
       const day = +arr[2].substring(0, 8);
+      const total = +arr[3].substring(0, 8);
       this.esb.year = year > 1000 ? year / 1000 + " kW" : year + " W";
       this.esb.month = month > 1000 ? month / 1000 + " kW" : month + " W";
       this.esb.day = day > 1000 ? day / 1000 + " kW" : day + " W";
+      this.esb.total = total > 1000 ? total / 1000 + " kW" : total + " W";
     })
     .then(() => fetch("http://192.168.100.49/params"))
     .then(r => r.text())

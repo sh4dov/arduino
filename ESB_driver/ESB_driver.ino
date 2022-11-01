@@ -1,7 +1,7 @@
 #include "pwd.h"
 #include "ESBDriver.h"
 
-IPAddress ip(192, 168, 100, 60);
+IPAddress ip(192, 168, 100, 49);
 
 ESBDriver driver(ip, ssid, password);
 

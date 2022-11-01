@@ -180,7 +180,6 @@ void ESBDriver::handleParams()
 void ESBDriver::handleStats()
 {
     this->sendHelloCommands();
-
     CRC16 crc;
     String query = "QEY";
     DateTime date = this->getDate();
@@ -201,6 +200,7 @@ void ESBDriver::handleStats()
     yearConsumption.remove(0, 1);
 
     crc.reset();
+    this->sendHelloCommands();
 
     query = "QEM";
     query += date.year;
@@ -220,6 +220,7 @@ void ESBDriver::handleStats()
     monthConsumption.remove(0, 1);
 
     crc.reset();
+    this->sendHelloCommands();
 
     query = "QED";
     query += date.year;
@@ -239,8 +240,26 @@ void ESBDriver::handleStats()
     String dayConsumption = Serial.readString();
     dayConsumption.remove(0, 1);
 
+    crc.reset();
+    this->sendHelloCommands();
+
+    query = "QET";
+    for (byte i = 0; i < query.length(); i++)
+    {
+        Serial.write(query[i]);
+        crc.add(query[i]);
+    }
+
+    c = crc.getCRC();
+    Serial.write((byte)(c & 0xFF));
+    Serial.write((byte)((c >> 8) & 0xFF));
+    Serial.write(0x0D);
+
+    String totalConsumption = Serial.readString();
+    totalConsumption.remove(0, 1);
+
     this->addCORSHeaders();
-    this->server.send(200, "text/plain", yearConsumption + "." + monthConsumption + "." + dayConsumption);
+    this->server.send(200, "text/plain", yearConsumption + "." + monthConsumption + "." + dayConsumption + "." + totalConsumption);
 }
 
 void ESBDriver::sendHelloCommands()
