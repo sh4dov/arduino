@@ -44,6 +44,21 @@ export class LightDriverListComponent implements OnInit {
     .then(data => {
       this.esb.params = data.split(' ');
     })
+    .then(() => {
+      if(!this.esb.day || this.esb.day == "NaN W"){
+        const d = new Date();
+        let q = d.getFullYear() + (d.getMonth() >= 9 ? "" + (d.getMonth() + 1) : "0" + (d.getMonth() + 1)) + (d.getDate() >= 9 ? "" + d.getDate() : "0" + d.getDate());
+        return fetch("http://192.168.100.49/qed?d=" + q, {
+          method: "GET"
+        }).then(r => r.text())
+        .then(data => {
+          const day = +data.substring(1, 9);
+          this.esb.day = day > 1000 ? day / 1000 + " kW" : day + " W";
+        })
+      }
+
+      return null;
+    })
     .finally(() => {
       setTimeout(() => this.getESBData(), 10000);
     });

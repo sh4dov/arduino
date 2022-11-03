@@ -39,11 +39,19 @@ void ESBDriver::begin()
     this->server.on("/reset", std::bind(&ESBDriver::handleReset, this));
     this->server.on("/params", std::bind(&ESBDriver::handleParams, this));
     this->server.on("/stats", std::bind(&ESBDriver::handleStats, this));
+    this->server.on("/qey", std::bind(&ESBDriver::handleQEY, this));
+    this->server.on("/qem", std::bind(&ESBDriver::handleQEM, this));
+    this->server.on("/qed", std::bind(&ESBDriver::handleQED, this));
+    this->server.on("/qeh", std::bind(&ESBDriver::handleQEH, this));
 
     this->server.on("/ota", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
     this->server.on("/reset", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
     this->server.on("/params", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
     this->server.on("/stats", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
+    this->server.on("/qey", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
+    this->server.on("/qem", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
+    this->server.on("/qed", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
+    this->server.on("/qeh", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
 
     this->server.onNotFound(std::bind(&ESBDriver::handleNotFound, this));
     this->server.begin();
@@ -260,6 +268,60 @@ void ESBDriver::handleStats()
 
     this->addCORSHeaders();
     this->server.send(200, "text/plain", yearConsumption + "." + monthConsumption + "." + dayConsumption + "." + totalConsumption);
+}
+
+void ESBDriver::handleQEY()
+{
+    this->handleQE("QEY", 4);
+}
+
+void ESBDriver::handleQEM()
+{
+    this->handleQE("QEM", 6);
+}
+
+void ESBDriver::handleQED()
+{
+    this->handleQE("QED", 8);
+}
+
+void ESBDriver::handleQEH()
+{
+    this->handleQE("QEH", 10);
+}
+
+void ESBDriver::handleQE(const char *qe, byte lenght)
+{
+    if (this->server.args() != 1 || this->server.arg(0).length() != lenght)
+    {
+        this->addCORSHeaders();
+        this->server.send(400, "text/plain", "invalid data");
+        return;
+    }
+
+    this->sendHelloCommands();
+    String hex = "";
+    CRC16 crc;
+    String query = String(qe) + this->server.arg(0);
+    for (byte i = 0; i < query.length(); i++)
+    {
+        Serial.write(query[i]);
+        crc.add(query[i]);
+        hex += String(query[i], HEX);
+    }
+
+    uint16_t c = crc.getCRC();
+    Serial.write((byte)(c & 0xFF));
+    Serial.write((byte)((c >> 8) & 0xFF));
+    Serial.write(0x0D);
+
+    hex += String((byte)(c & 0xFF), HEX);
+    hex += String((byte)((c >> 8) & 0xFF), HEX);
+
+    String result = Serial.readString();
+
+    this->addCORSHeaders();
+    this->server.send(200, "text/plain", result + "." + hex);
 }
 
 void ESBDriver::sendHelloCommands()

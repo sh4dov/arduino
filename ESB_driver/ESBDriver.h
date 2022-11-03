@@ -54,6 +54,11 @@ private:
     void handleRoot();
     void handleParams();
     void handleStats();
+    void handleQEY();
+    void handleQEM();
+    void handleQED();
+    void handleQEH();
+    void handleQE(const char *qe, byte lenght);
     void sendHelloCommands();
     DateTime getDate();
     void write(byte *buf, byte lenght);
