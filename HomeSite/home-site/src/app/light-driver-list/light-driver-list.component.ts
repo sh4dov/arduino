@@ -25,6 +25,7 @@ export class LightDriverListComponent implements OnInit {
   }
 
   getESBData() {
+    let day = 0;
     fetch("http://192.168.100.49/stats", {
       method: "GET"
     }).then(r => r.text())
@@ -32,7 +33,7 @@ export class LightDriverListComponent implements OnInit {
       const arr = data.split(".");
       const year = +arr[0].substring(0, 8);
       const month = +arr[1].substring(0, 8);
-      const day = +arr[2].substring(0, 8);
+      day = +arr[2].substring(0, 8);
       const total = +arr[3].substring(0, 8);
       this.esb.year = year > 1000 ? year / 1000 + " kW" : year + " W";
       this.esb.month = month > 1000 ? month / 1000 + " kW" : month + " W";
@@ -47,7 +48,7 @@ export class LightDriverListComponent implements OnInit {
       this.esb.params = data.split(' ');
     })
     .then(() => {
-      if(!this.esb.day || this.esb.day == "NaN W"){
+      if(!day){
         const d = new Date();
         let q = d.getFullYear() + (d.getMonth() >= 9 ? "" + (d.getMonth() + 1) : "0" + (d.getMonth() + 1)) + (d.getDate() >= 9 ? "" + d.getDate() : "0" + d.getDate());
         return fetch("http://192.168.100.49/qed?d=" + q, {
