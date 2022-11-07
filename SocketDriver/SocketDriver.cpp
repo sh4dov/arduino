@@ -137,8 +137,8 @@ void SocketDriver::handleTimeEvents()
             this->handlePvVoltage(false);
         }
 
-        // 10min
-        if (this->timer % 6000 == 0)
+        // 1min
+        if (this->timer % 600 == 0)
         {
             this->handlePvVoltage(true);
         }
@@ -167,8 +167,14 @@ void SocketDriver::handleReset()
 
 void SocketDriver::handleRoot()
 {
-    String src = "<div>Socket Driver</div>";
+    String src = "<div>Socket Driver is ";
+    src += (this->isOn ? "on" : "off");
+    src += "</div>";
+    src += "<div>Status: ";
+    src += this->status;
+    src += "</div>";
 
+    this->addCORSHeaders();
     this->server.send(200, "text/html", src);
 }
 
@@ -214,10 +220,14 @@ void SocketDriver::handlePvVoltage(bool checkOn)
 
                 if (checkOn && (pvVoltage >= 260 || (pvVoltage > 120 && pvPower > 10)))
                 {
+                    this->isOn = true;
+                    this->status = "Ok";
                     analogWrite(5, 255);
                 }
                 else if (!checkOn && pvVoltage < 260 && pvPower < 10)
                 {
+                    this->isOn = false;
+                    this->status = "low PV input";
                     analogWrite(5, 0);
                 }
             }
@@ -225,6 +235,8 @@ void SocketDriver::handlePvVoltage(bool checkOn)
         else
         {
             Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+            this->isOn = false;
+            this->status = http.errorToString(httpCode);
         }
 
         http.end();
@@ -232,5 +244,9 @@ void SocketDriver::handlePvVoltage(bool checkOn)
     else
     {
         Serial.printf("[HTTP} Unable to connect\n");
+        this->isOn = false;
+        this->status = "Unable to connect";
     }
+
+    analogWrite(5, this->isOn ? 255 : 0);
 }

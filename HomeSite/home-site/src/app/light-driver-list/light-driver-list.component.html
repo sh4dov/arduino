@@ -1,4 +1,4 @@
-<h2>Lights:</h2>
+<h2>Lights</h2>
 <a *ngFor="let driver of drivers; let i = index" [routerLink]="['/drivers', i]"
     [ngClass]="{'offline': !driver.online}">{{driver.name}}</a>
 <h2>ESB</h2>
@@ -16,4 +16,10 @@
   <div>Moc pozorna {{esb.params[4]}} W aktywna {{esb.params[5]}} W</div>
   <div>Temp {{esb.params[11]}} *C</div>
   <div>V_BUS {{esb.params[7]}} V</div>
+</div>
+<h2>Sockets</h2>
+<div *ngFor="let socket of sockets; index as i">
+  <p [innerHTML]="socket"></p>
+  <button (click)="turnOn(i)">On</button>
+  <button (click)="turnOff(i)">Off</button>
 </div>

@@ -17,11 +17,14 @@ export class LightDriverListComponent implements OnInit {
     total:"",
     params: []
   };
+  sockets = ["", ""];
+  ips = ["192.168.100.51", "192.168.100.53"];
 
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.getESBData();
+    this.getSockets();
   }
 
   getESBData() {
@@ -65,5 +68,33 @@ export class LightDriverListComponent implements OnInit {
     .finally(() => {
       setTimeout(() => this.getESBData(), 10000);
     });
+  }
+
+  getSockets(){
+    this.ips.forEach((ip, id, arr) => this.getSocket(ip, id));
+  }
+
+  getSocket(ip: string, id: number){
+    fetch("http://" + ip, {
+      method: "GET"
+    }).then(r => r.text())
+    .then(data => {
+      this.sockets[id] = data;
+    })
+    .finally(() => {
+      setTimeout(() => this.getSocket(ip, id), 10000);
+    });
+  }
+
+  turnOn(i: number){
+    fetch("http://" + this.ips[i] + "/on", {
+      method: "GET"
+    })
+  }
+
+  turnOff(i: number){
+    fetch("http://" + this.ips[i] + "/off", {
+      method: "GET"
+    })
   }
 }

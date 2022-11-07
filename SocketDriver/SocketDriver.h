@@ -45,6 +45,8 @@ private:
     bool otaEnabled = false;
     HTTPClient http;
     WiFiClient client;
+    bool isOn = false;
+    String status = "";
 
     void onWifiDisconnect(const WiFiEventStationModeDisconnected &event);
     void onWifiConnected(const WiFiEventStationModeConnected &event);
