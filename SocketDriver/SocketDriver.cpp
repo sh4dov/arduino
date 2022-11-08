@@ -199,6 +199,7 @@ void SocketDriver::handlePvVoltage(bool checkOn)
     {
         Serial.print("[HTTP] GET...\n");
         // start connection and send HTTP header
+        this->http.setTimeout(30000);
         int httpCode = http.GET();
 
         // httpCode will be negative on error
@@ -222,13 +223,11 @@ void SocketDriver::handlePvVoltage(bool checkOn)
                 {
                     this->isOn = true;
                     this->status = "Ok";
-                    analogWrite(5, 255);
                 }
                 else if (!checkOn && pvVoltage < 260 && pvPower < 10)
                 {
                     this->isOn = false;
                     this->status = "low PV input";
-                    analogWrite(5, 0);
                 }
             }
         }
