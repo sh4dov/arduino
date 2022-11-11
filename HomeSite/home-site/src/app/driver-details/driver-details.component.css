@@ -7,7 +7,7 @@ h2 {
 
 h3 {
     font-size: 35px;
-    text-align: center;    
+    text-align: center;
 }
 
 .back-btn {
@@ -170,4 +170,8 @@ span {
 
 .offline {
     background-color: red;
+}
+
+.error {
+  background-color: red;
 }

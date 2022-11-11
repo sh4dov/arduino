@@ -5,6 +5,98 @@ const app = express();
 
 const sockets = ["192.168.100.51", "192.168.100.53"];
 
+const drivers = [
+    {
+        id: 1,
+        name: "Kuchnia dół",
+        ip: "192.168.100.32",
+        from: 7,
+        to: 16,
+        online: false,
+        error: "",
+        lights: [
+            {
+                name: "Oswietlenie górne",
+                id: 1,
+                auto: true,
+                on: true,
+                brightness: 100
+            },
+            {
+                name: "Oswietlenie szafek",
+                id: 2,
+                auto: false,
+                on: false,
+                brightness: 100
+            },
+            {
+                name: "Oswietlenie blat",
+                id: 3,
+                auto: false,
+                on: false,
+                brightness: 100
+            },
+            {
+                name: "Oswietlenie podłoga",
+                id: 4,
+                auto: true,
+                on: false,
+                brightness: 100
+            }
+        ]
+    },
+    {
+        id: 2,
+        name: "Korytarz dół",
+        ip: "192.168.100.33",
+        from: 7,
+        to: 16,
+        online: false,
+        error: "",
+        lights: [
+            {
+                name: "Plafon",
+                id: 1,
+                auto: true,
+                on: false,
+                brightness: 100
+            },
+            {
+                name: "Główne",
+                id: 2,
+                auto: true,
+                on: false,
+                brightness: 100
+            }
+        ]
+    },
+    {
+        id: 3,
+        name: "Korytarz góra",
+        ip: "192.168.100.34",
+        from: 7,
+        to: 16,
+        online: false,
+        error: "",
+        lights: [
+            {
+                name: "Plafon",
+                id: 1,
+                auto: true,
+                on: false,
+                brightness: 50
+            },
+            {
+                name: "Główne",
+                id: 2,
+                auto: true,
+                on: false,
+                brightness: 50
+            }
+        ]
+    }
+];
+
 app.get('/', (request, response) => {
     response.send("Home Site backend");    
 });
@@ -171,6 +263,114 @@ app.get("/api/sbu", (request, response) => {
         res.on("end", () => {
             response.send(data);
         });
+    });
+});
+
+app.get("/api/drivers", (request, response) => {
+    var result = [];
+    drivers.forEach((d, id) => {
+        result.push(null);
+
+        http.get("http://" + d.ip + "/conf", res => {
+            let data = "";
+            res.on("data", chunk => data += chunk);
+            res.on("error", err => {
+                d.error = err;
+                d.online = false;
+                result[id] = d;
+
+                if(result.every(r => !!r)){
+                    response.json(result);
+                }
+            });
+            res.on("end", () => {
+                const conf = JSON.parse(data);
+                d.from = conf.from;
+                d.to = conf.to;
+                d.online = true;
+                conf.lights.forEach((l, i) => {
+                    d.lights[i].auto = l.auto;
+                    d.lights[i].brightness = l.brightness;
+                    d.lights[i].on = l.on;
+                });
+
+                result[id] = d;
+                if(result.every(r => !!r)){
+                    response.json(result);
+                }
+            });
+        });
+    });
+});
+
+app.get("/api/drivers/:id", (request, response) => {
+    const id = +request.params["id"];
+    const dr = drivers.filter(d => d.id == id);
+    const d = dr.length ? dr[0] : null;
+
+    if(!d){
+        response.status(500).send("unknown id");
+        return;
+    }
+
+    http.get("http://" + d.ip + "/conf", res => {
+        let data = "";
+        res.on("data", chunk => data += chunk);
+        res.on("error", err => {
+            d.error = err;
+            d.online = false;
+
+            response.json(d);
+        });
+        res.on("end", () => {
+            const conf = JSON.parse(data);
+            d.from = conf.from;
+            d.to = conf.to;
+            d.online = true;
+            conf.lights.forEach((l, i) => {
+                d.lights[i].auto = l.auto;
+                d.lights[i].brightness = l.brightness;
+                d.lights[i].on = l.on;
+            });
+
+            response.json(d);
+        });
+    });
+});
+
+app.post("/api/drivers/:id/onoff", (request, response) => {
+    const id = +request.params["id"];
+    const dr = drivers.filter(d => d.id == id);
+    const driver = dr.length ? dr[0] : null;
+
+    if(!driver){
+        response.status(500).send("unknown id");
+        return;
+    }
+
+    let data = "";
+    request.on("data", chunk => data += chunk);
+    request.on("end", () => {
+        const req = http.request({
+            hostname: driver.ip,
+            path: "/onoff",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Lenght": data.length
+            }
+        }, res => {
+            data = "";
+            res.on("data", chunk => data += chunk);
+            res.on("error", err => {
+                response.status(500).send(err);
+            });
+            res.on("end", () => {
+                response.send(data || "ok");
+            });
+        });
+        req.write(data);
+        req.end();
     });
 });
 

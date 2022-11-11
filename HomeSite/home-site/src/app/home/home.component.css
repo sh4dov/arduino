@@ -1,0 +1,11 @@
+a {
+  display: block;
+  font-size: 20px;
+  padding: 20px;
+  background-color: rgb(8, 78, 143);
+  border: 1px solid lightblue;
+  margin: 40px 20%;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+}

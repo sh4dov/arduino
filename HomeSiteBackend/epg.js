@@ -60,9 +60,11 @@ const channels = [
     {name: "TVP Kultura", no: 16},
     {name: "Warner TV", no: 106}, 
     {name: "WP", no: 69}, 
-    {name: "ZOOM TV", no: 22}];              
+    {name: "ZOOM TV", no: 22}];     
+    
+const cache = {};
 
-const getDate = (s) =>{
+const getDate = (s) => {
     return utcToLocal(new Date(+s.substring(0,4), +s.substring(4, 6) - 1, +s.substring(6, 8), +s.substring(8, 10), s.substring(10,12), 0, 0));
 };
 
@@ -81,6 +83,19 @@ app.get("/epg/:date", (request, response) =>{
     const date = request.params["date"];
     if(date.length != 10){
         response.status(500).send("invalid date");
+        return;
+    }
+
+    Object.keys(cache).forEach(k => {
+        const now = new Date();
+        const cd = new Date(+k.substring(0,4), +k.substring(4,6) - 1, +k.substring(6,8), +k.substring(8,10), 59, 59, 0);
+        if(cd < now){
+            delete cache[k];
+        }
+    });
+
+    if(cache[date]){
+        response.json(cache[date]);        
         return;
     }
     
@@ -133,15 +148,18 @@ app.get("/epg/:date", (request, response) =>{
         }
     });
 
-    reader.on("done", () =>{
+    reader.on("done", () => {
         result.forEach(r => {
             const icons = channelsIco.filter(i => i.id == r.channel);
             r.channelImg = icons.length ? icons[0].icon : ""
         });
+
+        cache[date] = result;
         response.json(result);
     });
 
-    const s = fs.readFile("C:\\Users\\z8qar\\Downloads\\pl.xml", "utf8", (err, data) => {
+    const s = fs.readFile("/home/orangepi/homesitebackend/pl.xml", "utf8", (err, data) => {
+    //const s = fs.readFile("C:\\Users\\z8qar\\Downloads\\pl.xml", "utf8", (err, data) => {
         reader.parse(data);
     });
 });

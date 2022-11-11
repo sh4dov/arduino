@@ -15,6 +15,18 @@ a {
     color: white;
 }
 
+.back-btn {
+  display: block;
+  font-size: 20px;
+  padding: 20px;
+  background-color: rgb(67, 177, 116);
+  border: 1px solid lightblue;
+  margin: 40px 20%;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+}
+
 .offline {
     background-color: red;
 }

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { finalize, tap } from 'rxjs';
+import { RepeateService } from '../services/RepeateService';
 
 interface Socket {
   id: number;
@@ -12,20 +13,26 @@ interface Socket {
   templateUrl: './sockets.component.html',
   styleUrls: ['./sockets.component.css']
 })
-export class SocketsComponent implements OnInit {
+export class SocketsComponent implements OnInit, OnDestroy {
   public sockets: Socket[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private repeate: RepeateService) { }
+
+  ngOnDestroy(): void {
+    this.repeate.unsubscribe();
+  }
 
   ngOnInit(): void {
-    this.getSockets();
+    this.repeate.subscribe(() => this.getSockets());
   }
 
   getSockets(){
     this.http.get<Socket[]>("/api/sockets")
     .pipe(
       tap(sockets => this.sockets = sockets),
-      finalize(() => setTimeout(() => this.getSockets(), 10000))
+      finalize(() => this.repeate.repeate())
     )
     .subscribe();
   }

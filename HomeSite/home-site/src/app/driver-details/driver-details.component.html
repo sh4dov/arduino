@@ -1,7 +1,8 @@
-<a class="back-btn" [routerLink]="['/']">Back</a>
+<a class="back-btn" [routerLink]="['/lights']">Back</a>
 
 <section *ngIf="driver">
     <h2 [ngClass]="{'offline': !driver.online}">{{driver.name}}</h2>
+    <div class="error" *ngIf="driver.error">{{driver.error}}</div>
 
     <div *ngFor="let light of driver.lights">
         <h3>{{light.name}}</h3>
@@ -18,5 +19,5 @@
     </div>
     <button (click)="saveSettings()">Save</button>
 
-    <a class="back-btn" [routerLink]="['/']">Back</a>
+    <a class="back-btn" [routerLink]="['/lights']">Back</a>
 </section>

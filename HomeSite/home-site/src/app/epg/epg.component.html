@@ -1,9 +1,10 @@
+<a class="back-btn" [routerLink]="['/']">Back</a>
+
 <div class="time-select">
   <span>{{time}}:00</span>
   <button (click)="timeUp()">up</button>
   <button (click)="timeDown()">down</button>
   <button class="search" (click)="search()">search</button>
-  <button class="back" [routerLink]="['/']">Back</button>
 </div>
 
 <div *ngIf="isLoading | async" class="loader">Loading...</div>

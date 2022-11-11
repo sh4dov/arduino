@@ -9,6 +9,8 @@ import { FormsModule } from '@angular/forms';
 import { ESBComponent } from './esb/esb.component';
 import { SocketsComponent } from './sockets/sockets.component';
 import { EpgComponent } from './epg/epg.component';
+import { HomeComponent } from './home/home.component';
+import { RepeateService } from './services/RepeateService';
 
 @NgModule({
   imports: [
@@ -16,9 +18,11 @@ import { EpgComponent } from './epg/epg.component';
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: '', component: LightDriverListComponent },
-      { path: 'drivers/:id', component: DriverDetailsComponent },
-      { path: 'epg', component: EpgComponent }
+      { path: '', component: HomeComponent },
+      { path: 'lights', component: LightDriverListComponent },
+      { path: 'lights/:id', component: DriverDetailsComponent },
+      { path: 'epg', component: EpgComponent },
+      { path: 'esb', component: ESBComponent }
     ], { useHash: true })
   ],
   declarations: [
@@ -27,9 +31,10 @@ import { EpgComponent } from './epg/epg.component';
     DriverDetailsComponent,
     ESBComponent,
     SocketsComponent,
-    EpgComponent
+    EpgComponent,
+    HomeComponent
   ],
-  providers: [],
+  providers: [RepeateService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

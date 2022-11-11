@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { finalize, switchMap, tap } from 'rxjs';
+import { RepeateService } from '../services/RepeateService';
 
 interface Stats {
   year: number,
@@ -50,15 +51,21 @@ interface Params {
   templateUrl: './esb.component.html',
   styleUrls: ['./esb.component.css']
 })
-export class ESBComponent implements OnInit {
+export class ESBComponent implements OnInit, OnDestroy {
   public stats: StatsDisplay = {day: "", month: "", total: "", year: ""};
   public params: Params = {ac: {voltage: "", hz: ""}, ac_out: {voltage: "", hz: ""}, acu: {charging: "", discharge: "", soc: "", voltage: ""},load: "", power: {active: "", apparent: ""}, pv: {amp: "", voltage: "", watt: ""}, temp: "", v_bus: ""};
   public workType = "";
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private repeate: RepeateService) { }
+
+  ngOnDestroy(): void {
+    this.repeate.unsubscribe();
+  }
 
   ngOnInit(): void {
-    this.getData();
+    this.repeate.subscribe(() => this.getData());
   }
 
   getData(){
@@ -66,7 +73,7 @@ export class ESBComponent implements OnInit {
     .pipe(
       switchMap(() => this.getParams()),
       switchMap(() => this.getWorkType()),
-      finalize(() => setTimeout(() => this.getData(), 10000)))
+      finalize(() => this.repeate.repeate()))
     .subscribe();
   }
 
