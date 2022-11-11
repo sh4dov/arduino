@@ -1,0 +1,19 @@
+<h2>ESB</h2>
+<div class="prod">
+  <div>Production:</div>
+  <div>Total {{stats.total}}</div>
+  <div>Year {{stats.year}}</div>
+  <div>Month {{stats.month}}</div>
+  <div>Day {{stats.day}}</div>
+  <div>PV {{params.pv.voltage}} V {{params.pv.amp}} A {{params.pv.watt}} W</div>
+  <div>ACU {{params.acu.voltage}} V Charging {{params.acu.charging}} A Discharge {{params.acu.discharge}} A</div>
+  <div>Load {{params.load}}% SoC {{params.acu.soc}}%</div>
+  <div>AC     {{params.ac.voltage}} V {{params.ac.hz}} Hz</div>
+  <div>AC out {{params.ac_out.voltage}} V {{params.ac_out.hz}} Hz</div>
+  <div>Moc pozorna {{params.power.apparent}} W aktywna {{params.power.active}} W</div>
+  <div>Temp {{params.temp}} *C</div>
+  <div>V_BUS {{params.v_bus}} V</div>
+  <div>Work type {{workType}}</div>
+  <button (click)="setSbu()">SBU</button>
+  <button (click)="setSub()">SUB</button>
+</div>

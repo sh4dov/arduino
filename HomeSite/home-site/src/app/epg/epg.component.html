@@ -1,0 +1,26 @@
+<div class="time-select">
+  <span>{{time}}:00</span>
+  <button (click)="timeUp()">up</button>
+  <button (click)="timeDown()">down</button>
+  <button class="search" (click)="search()">search</button>
+  <button class="back" [routerLink]="['/']">Back</button>
+</div>
+
+<div *ngIf="isLoading | async" class="loader">Loading...</div>
+
+<div *ngFor="let r of records">
+  <div class="channel-info">
+    <img src="{{r.channelImg}}" *ngIf="r.channelImg" class="channel-img">
+    <span *ngIf="!r.channelImg">{{r.channel}}</span>
+    <span class="no">{{r.no}}</span>
+    <span class="time">{{r.startDisplay}} - {{r.stopDisplay}}</span>
+  </div>
+
+  <div class="title">{{r.title}}</div>
+  <div class="categories">
+    <span *ngFor="let c of r.categories" class="category">{{c}}</span>
+  </div>
+  <div class="description">
+    <img src="{{r.img}}" class="program-img">
+    {{r.desc}}</div>
+</div>

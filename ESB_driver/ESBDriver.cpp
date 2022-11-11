@@ -43,6 +43,9 @@ void ESBDriver::begin()
     this->server.on("/qem", std::bind(&ESBDriver::handleQEM, this));
     this->server.on("/qed", std::bind(&ESBDriver::handleQED, this));
     this->server.on("/qeh", std::bind(&ESBDriver::handleQEH, this));
+    this->server.on("/sbu", std::bind(&ESBDriver::handleSBU, this));
+    this->server.on("/sub", std::bind(&ESBDriver::handleSUB, this));
+    this->server.on("/worktype", std::bind(&ESBDriver::handleWorkType, this));
 
     this->server.on("/ota", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
     this->server.on("/reset", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
@@ -52,6 +55,9 @@ void ESBDriver::begin()
     this->server.on("/qem", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
     this->server.on("/qed", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
     this->server.on("/qeh", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
+    this->server.on("/sbu", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
+    this->server.on("/sub", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
+    this->server.on("/worktype", HTTP_OPTIONS, std::bind(&ESBDriver::handleOptions, this));
 
     this->server.onNotFound(std::bind(&ESBDriver::handleNotFound, this));
     this->server.begin();
@@ -139,6 +145,7 @@ void ESBDriver::handleTimeEvents()
         if (this->timer % 600 == 0)
         {
             this->getTime();
+            this->setWorkType();
         }
     }
 }
@@ -180,6 +187,27 @@ void ESBDriver::handleParams()
     this->write(qpigs, sizeof(qpigs));
     String result = Serial.readString();
     result.remove(0, 1);
+
+    this->addCORSHeaders();
+    this->server.send(200, "text/plain", result);
+}
+
+void ESBDriver::handleWorkType()
+{
+    String result;
+    switch (this->workType)
+    {
+    case WorkType::sbu:
+        result = "sbu";
+        break;
+
+    case WorkType::sub:
+        result = "sub";
+        break;
+
+    default:
+        result = "unknown";
+    }
 
     this->addCORSHeaders();
     this->server.send(200, "text/plain", result);
@@ -343,6 +371,68 @@ void ESBDriver::write(byte *buf, byte lenght)
     for (byte i = 0; i < lenght; i++)
     {
         Serial.write(buf[i]);
+    }
+}
+
+void ESBDriver::handleSBU()
+{
+    byte sbu[8] = {0x50, 0x4F, 0x50, 0x30, 0x32, 0xE2, 0x0B, 0x0D};
+    this->sendHelloCommands();
+
+    this->workType = WorkType::sbu;
+
+    this->write(sbu, sizeof(sbu));
+    String result = Serial.readString();
+
+    this->addCORSHeaders();
+    this->server.send(200, "text/plain", result);
+}
+
+void ESBDriver::handleSUB()
+{
+    byte sub[8] = {0x50, 0x4F, 0x50, 0x30, 0x31, 0xD2, 0x69, 0x0D};
+    this->sendHelloCommands();
+
+    this->workType = WorkType::sub;
+
+    this->write(sub, sizeof(sub));
+    String result = Serial.readString();
+
+    this->addCORSHeaders();
+    this->server.send(200, "text/plain", result);
+}
+
+void ESBDriver::setWorkType()
+{
+    byte qpigs[8] = {0x51, 0x50, 0x49, 0x47, 0x53, 0xB7, 0xA9, 0x0D};
+    byte sbu[8] = {0x50, 0x4F, 0x50, 0x30, 0x32, 0xE2, 0x0B, 0x0D}; // PV, ACU, AC
+    byte sub[8] = {0x50, 0x4F, 0x50, 0x30, 0x31, 0xD2, 0x69, 0x0D}; // PV, AC, ACU
+
+    this->sendHelloCommands();
+    this->write(qpigs, sizeof(qpigs));
+    String params = Serial.readString();
+    params.remove(0, 1);
+
+    int pvVoltage = params.substring(64, 67).toInt();
+    int soc = params.substring(50, 53).toInt();
+
+    if (this->workType != WorkType::sub && (pvVoltage < 250 || soc < 70))
+    {
+        this->write(sub, sizeof(sub));
+        String ack = Serial.readString();
+        if (ack.substring(1, 4) == "ACK")
+        {
+            this->workType = WorkType::sub;
+        }
+    }
+    else if (this->workType != WorkType::sbu && pvVoltage >= 250 && soc >= 70)
+    {
+        this->write(sbu, sizeof(sbu));
+        String ack = Serial.readString();
+        if (ack.substring(1, 4) == "ACK")
+        {
+            this->workType = WorkType::sbu;
+        }
     }
 }
 

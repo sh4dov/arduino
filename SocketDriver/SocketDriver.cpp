@@ -181,6 +181,7 @@ void SocketDriver::handleRoot()
 void SocketDriver::handleOff()
 {
     analogWrite(5, 0);
+    this->isOn = false;
     this->addCORSHeaders();
     this->server.send(200, "text/plain", "off");
 }
@@ -188,6 +189,7 @@ void SocketDriver::handleOff()
 void SocketDriver::handleOn()
 {
     analogWrite(5, 255);
+    this->isOn = true;
     this->addCORSHeaders();
     this->server.send(200, "text/plain", "on");
 }
@@ -219,7 +221,7 @@ void SocketDriver::handlePvVoltage(bool checkOn)
                 Serial.println(pvVoltage);
                 Serial.println(pvPower);
 
-                if (checkOn && (pvVoltage >= 260 || (pvVoltage > 120 && pvPower > 10)))
+                if (checkOn && (pvVoltage >= 260 || (pvVoltage > 130 && pvPower > 10)))
                 {
                     this->isOn = true;
                     this->status = "Ok";

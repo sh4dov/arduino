@@ -6,6 +6,9 @@ import { AppComponent } from './app.component';
 import { LightDriverListComponent } from './light-driver-list/light-driver-list.component';
 import { DriverDetailsComponent } from './driver-details/driver-details.component';
 import { FormsModule } from '@angular/forms';
+import { ESBComponent } from './esb/esb.component';
+import { SocketsComponent } from './sockets/sockets.component';
+import { EpgComponent } from './epg/epg.component';
 
 @NgModule({
   imports: [
@@ -14,13 +17,17 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     RouterModule.forRoot([
       { path: '', component: LightDriverListComponent },
-      { path: 'drivers/:id', component: DriverDetailsComponent }
+      { path: 'drivers/:id', component: DriverDetailsComponent },
+      { path: 'epg', component: EpgComponent }
     ], { useHash: true })
   ],
   declarations: [
     AppComponent,
     LightDriverListComponent,
-    DriverDetailsComponent
+    DriverDetailsComponent,
+    ESBComponent,
+    SocketsComponent,
+    EpgComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -22,6 +22,23 @@ struct DateTime
     byte second;
 };
 
+typedef enum
+{
+    None = 0,
+    Params = 2,
+    Stats = 4,
+    QEY = 8,
+    QEM = 16,
+    QED = 32
+} Operation;
+
+typedef enum
+{
+    Unknown = 0,
+    sbu = 1,
+    sub = 2
+} WorkType;
+
 class ESBDriver
 {
 private:
@@ -41,6 +58,8 @@ private:
     unsigned long nextRead = 0;
     int timer = 0;
     bool otaEnabled = false;
+    byte operationQueue = Operation::None;
+    WorkType workType = WorkType::Unknown;
 
     void onWifiDisconnect(const WiFiEventStationModeDisconnected &event);
     void onWifiConnected(const WiFiEventStationModeConnected &event);
@@ -59,7 +78,11 @@ private:
     void handleQED();
     void handleQEH();
     void handleQE(const char *qe, byte lenght);
+    void handleSBU();
+    void handleSUB();
+    void handleWorkType();
     void sendHelloCommands();
+    void setWorkType();
     DateTime getDate();
     void write(byte *buf, byte lenght);
 
