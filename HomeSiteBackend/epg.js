@@ -1,7 +1,6 @@
 const XmlReader = require("xml-reader");
 const fs = require("fs");
 const express = require('express');
-const { resourceLimits } = require("worker_threads");
 
 const app = express();
 
@@ -158,8 +157,8 @@ app.get("/epg/:date", (request, response) =>{
         response.json(result);
     });
 
-    const s = fs.readFile("/home/orangepi/homesitebackend/pl.xml", "utf8", (err, data) => {
-    //const s = fs.readFile("C:\\Users\\z8qar\\Downloads\\pl.xml", "utf8", (err, data) => {
+    //const s = fs.readFile("/home/orangepi/homesitebackend/pl.xml", "utf8", (err, data) => {
+    const s = fs.readFile("C:\\Users\\z8qar\\Downloads\\pl.xml", "utf8", (err, data) => {
         reader.parse(data);
     });
 });

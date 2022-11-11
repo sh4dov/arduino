@@ -2,7 +2,7 @@
   "name": "home-site-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "epg.js",
+  "main": "epg_cache.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
