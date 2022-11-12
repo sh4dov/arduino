@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { finalize, switchMap, tap } from 'rxjs';
-import { RepeateService } from '../services/RepeateService';
+import { RepeateService, RepeaterServiceFactory } from '../services/RepeateService';
 
 interface Stats {
   year: number,
@@ -55,17 +55,18 @@ export class ESBComponent implements OnInit, OnDestroy {
   public stats: StatsDisplay = {day: "", month: "", total: "", year: ""};
   public params: Params = {ac: {voltage: "", hz: ""}, ac_out: {voltage: "", hz: ""}, acu: {charging: "", discharge: "", soc: "", voltage: ""},load: "", power: {active: "", apparent: ""}, pv: {amp: "", voltage: "", watt: ""}, temp: "", v_bus: ""};
   public workType = "";
+  private repeate: RepeateService | undefined;
 
   constructor(
     private http: HttpClient,
-    private repeate: RepeateService) { }
+    private repeateFactory: RepeaterServiceFactory) { }
 
   ngOnDestroy(): void {
-    this.repeate.unsubscribe();
+    this.repeate?.unsubscribe();
   }
 
   ngOnInit(): void {
-    this.repeate.subscribe(() => this.getData());
+    this.repeate = this.repeateFactory.create(() => this.getData());
   }
 
   getData(){
@@ -73,7 +74,7 @@ export class ESBComponent implements OnInit, OnDestroy {
     .pipe(
       switchMap(() => this.getParams()),
       switchMap(() => this.getWorkType()),
-      finalize(() => this.repeate.repeate()))
+      finalize(() => this.repeate?.repeate()))
     .subscribe();
   }
 

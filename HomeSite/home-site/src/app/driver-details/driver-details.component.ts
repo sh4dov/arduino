@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Driver, Light } from '../driver';
 import { finalize, Subject, tap } from 'rxjs';
-import { RepeateService } from '../services/RepeateService';
+import { RepeaterServiceFactory, RepeateService } from '../services/RepeateService';
 
 @Component({
   selector: 'app-driver-details',
@@ -13,20 +13,21 @@ import { RepeateService } from '../services/RepeateService';
 export class DriverDetailsComponent implements OnInit, OnDestroy {
   private id: number = 0;
   driver: Driver | undefined;
+  private repeate: RepeateService | undefined;
 
   constructor(private route: ActivatedRoute,
     private http: HttpClient,
-    private repeate: RepeateService) { }
+    private repeateFactory: RepeaterServiceFactory) { }
 
   ngOnInit(): void {
     const routePrams = this.route.snapshot.paramMap;
     this.id = Number(routePrams.get('id'));
 
-    this.repeate.subscribe(() => this.getDriver());
+    this.repeate = this.repeateFactory.create(() => this.getDriver());
   }
 
   ngOnDestroy(){
-    this.repeate.unsubscribe();
+    this.repeate?.unsubscribe();
   }
 
   getDriver(){
@@ -34,7 +35,7 @@ export class DriverDetailsComponent implements OnInit, OnDestroy {
       .pipe(
         tap(driver => this.driver = driver),
         finalize(() => {
-            this.repeate.repeate()
+            this.repeate?.repeate()
         })
       )
       .subscribe();

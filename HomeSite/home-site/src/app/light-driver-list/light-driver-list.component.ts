@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Driver } from '../driver';
 import { finalize, tap } from 'rxjs/operators';
-import { RepeateService } from '../services/RepeateService';
+import { RepeaterServiceFactory, RepeateService } from '../services/RepeateService';
 
 @Component({
   selector: 'app-light-driver-list',
@@ -11,17 +11,18 @@ import { RepeateService } from '../services/RepeateService';
 })
 export class LightDriverListComponent implements OnInit, OnDestroy {
   drivers: Driver[] = [];
+  private repeate: RepeateService | undefined;
 
   constructor(
     private http: HttpClient,
-    private repeate: RepeateService) { }
+    private repeateFactory: RepeaterServiceFactory) { }
 
   ngOnDestroy(): void {
-    this.repeate.unsubscribe();
+    this.repeate?.unsubscribe();
   }
 
   ngOnInit(): void {
-    this.repeate.subscribe(() => this.getDrivers());
+    this.repeate = this.repeateFactory.create(() => this.getDrivers());
   }
 
   getDrivers() {
@@ -29,7 +30,7 @@ export class LightDriverListComponent implements OnInit, OnDestroy {
     .pipe(tap(drivers => {
       this.drivers = drivers;
     }),
-    finalize(() => this.repeate.repeate()))
+    finalize(() => this.repeate?.repeate()))
     .subscribe();
   }
 }
