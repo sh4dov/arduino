@@ -4,6 +4,7 @@ export interface Light {
     auto: boolean;
     on: boolean;
     brightness: number;
+    loading: boolean;
 }
 
 export interface Driver {

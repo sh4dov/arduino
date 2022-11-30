@@ -141,8 +141,36 @@ app.get("/api/params", (request, response) => {
     });
 });
 
+app.get("/api/qem/:d", (request, response) => {
+    const d = +request.params["d"];
+    var data = "";
+
+    http.get("http://192.168.100.49/qem?d=" + d, res => {
+        res.on("data", chunk => data += chunk);
+        res.on("end", () => {
+            const result = {value: +data.substring(1, 9)};
+
+            response.send(JSON.stringify(result));
+        });
+    });
+});
+
+app.get("/api/qed/:d", (request, response) => {
+    const d = +request.params["d"];
+    var data = "";
+
+    http.get("http://192.168.100.49/qed?d=" + d, res => {
+        res.on("data", chunk => data += chunk);
+        res.on("end", () => {
+            const result = {value: +data.substring(1, 9)};
+
+            response.send(JSON.stringify(result));
+        });
+    });
+});
+
 app.get("/api/stats", (request, response) =>{
-    var data = ""
+    var data = "";
     http.get("http://192.168.100.49/stats", res => {
         res.on("data", chunk => data += chunk);
         res.on("error", err => console.log(err));

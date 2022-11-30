@@ -1,14 +1,16 @@
 <a class="back-btn" [routerLink]="['/lights']">Back</a>
 
-<section *ngIf="driver">
+<section *ngIf="(driverStore.getDriver(id) | async) as driver">
     <h2 [ngClass]="{'offline': !driver.online}">{{driver.name}}</h2>
     <div class="error" *ngIf="driver.error">{{driver.error}}</div>
 
     <div *ngFor="let light of driver.lights">
         <h3>{{light.name}}</h3>
-        <button (click)="changeState(light)">{{ light.on ? 'off' : 'on' }}</button>
-        <input type="range" min="0" max="255" [(ngModel)]="light.brightness" (input)="changeBrightness(light)">
-        <input type="checkbox" (change)="changeAuto(light)" id="chx_{{light.id}}" [(ngModel)]="light.auto"><label
+        <button (click)="driverStore.changeState(driver, light)">{{ light.on ? 'off' : 'on' }}
+          <div *ngIf="light.loading" class="loading"></div>
+        </button>
+        <input type="range" min="0" max="255" [(ngModel)]="light.brightness" (input)="driverStore.changeBrightness(driver, light)">
+        <input type="checkbox" (change)="driverStore.changeAuto(driver, light)" id="chx_{{light.id}}" [(ngModel)]="light.auto"><label
             for="chx_{{light.id}}">Auto</label>
     </div>
 
@@ -17,7 +19,7 @@
         <input type="number" min="0" max="23" [(ngModel)]="driver.from">
         <input type="number" min="0" max="23" [(ngModel)]="driver.to">
     </div>
-    <button (click)="saveSettings()">Save</button>
+    <button (click)="driverStore.saveSettings(driver)">Save</button>
 
     <a class="back-btn" [routerLink]="['/lights']">Back</a>
 </section>

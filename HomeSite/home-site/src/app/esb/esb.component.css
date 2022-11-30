@@ -25,3 +25,8 @@ button {
   text-decoration: none;
   color: white;
 }
+
+.stats {
+  display: inline-block;
+  margin: 10px;
+}

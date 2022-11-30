@@ -1,6 +1,6 @@
 <h2>Sockets</h2>
-<div *ngFor="let socket of sockets; index as i">
+<div *ngFor="let socket of store.sockets | async; index as i">
   <p [innerHTML]="socket.data"></p>
-  <button (click)="turnOn(socket.id)">On</button>
-  <button (click)="turnOff(socket.id)">Off</button>
+  <button (click)="store.turnOn(socket.id)">On</button>
+  <button (click)="store.turnOff(socket.id)">Off</button>
 </div>

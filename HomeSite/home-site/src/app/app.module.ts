@@ -11,6 +11,9 @@ import { SocketsComponent } from './sockets/sockets.component';
 import { EpgComponent } from './epg/epg.component';
 import { HomeComponent } from './home/home.component';
 import { RepeaterServiceFactory, RepeateService } from './services/RepeateService';
+import { DriverStore } from './services/stores/driverStore';
+import { ESBStore } from './services/stores/ESBStore';
+import { SocketStore } from './services/stores/SocketStore';
 
 @NgModule({
   imports: [
@@ -34,7 +37,7 @@ import { RepeaterServiceFactory, RepeateService } from './services/RepeateServic
     EpgComponent,
     HomeComponent
   ],
-  providers: [RepeaterServiceFactory],
+  providers: [RepeaterServiceFactory, DriverStore, ESBStore, SocketStore],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

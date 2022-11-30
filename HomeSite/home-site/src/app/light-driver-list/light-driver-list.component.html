@@ -1,4 +1,4 @@
 <a class="back-btn" [routerLink]="['/']">Back</a>
 <h2>Lights</h2>
-<a *ngFor="let driver of drivers" [routerLink]="['/lights', driver.id]"
+<a *ngFor="let driver of driverStore.drivers | async" [routerLink]="['/lights', driver.id]"
     [ngClass]="{'offline': !driver.online}">{{driver.name}}</a>
