@@ -97,6 +97,12 @@ const drivers = [
     }
 ];
 
+app.use((err, req, res, next) => {
+    res
+    .status(err.status || 500)
+    .send({message: err.message, stack: err.stack});
+});
+
 app.get('/', (request, response) => {
     response.send("Home Site backend");    
 });

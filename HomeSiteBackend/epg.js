@@ -64,7 +64,7 @@ const channels = [
 const cache = {};
 
 const getDate = (s) => {
-    return utcToLocal(new Date(+s.substring(0,4), +s.substring(4, 6) - 1, +s.substring(6, 8), +s.substring(8, 10), s.substring(10,12), 0, 0));
+    return new Date(+s.substring(0,4), +s.substring(4, 6) - 1, +s.substring(6, 8), +s.substring(8, 10), s.substring(10,12), 0, 0);
 };
 
 const utcToLocal = (date) => {
@@ -124,7 +124,8 @@ app.get("/epg/:date", (request, response) =>{
     });
 
     reader.on('tag:programme', data => {
-        if(channels.some(c => c.name == data.attributes.channel) && getDate(data.attributes.start) >= from && getDate(data.attributes.start) < to){
+        const start = getDate(data.attributes.start);
+        if(channels.some(c => c.name == data.attributes.channel) && start >= from && start < to){
             const img = data.children.filter(c => c.name == "icon");
             const desc = data.children.filter(c => c.name == "desc");
             const title = data.children.filter(c => c.name == "title");
@@ -132,7 +133,7 @@ app.get("/epg/:date", (request, response) =>{
 
             const item = {
                 channel: data.attributes.channel,
-                start: getDate(data.attributes.start),
+                start: start,
                 stop: getDate(data.attributes.stop),
                 title: title.length ? title[0].children[0].value : "",
                 categories: data.children.filter(c => c.name == "category").map(c => c.children[0].value),
@@ -157,8 +158,8 @@ app.get("/epg/:date", (request, response) =>{
         response.json(result);
     });
 
-    //const s = fs.readFile("/home/orangepi/homesitebackend/pl.xml", "utf8", (err, data) => {
-    const s = fs.readFile("C:\\Users\\z8qar\\Downloads\\pl.xml", "utf8", (err, data) => {
+    const s = fs.readFile("/home/orangepi/homesitebackend/pl.xml", "utf8", (err, data) => {
+    //const s = fs.readFile("C:\\Users\\z8qar\\Downloads\\pl.xml", "utf8", (err, data) => {
         reader.parse(data);
     });
 });
