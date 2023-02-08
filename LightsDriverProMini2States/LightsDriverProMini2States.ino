@@ -1,3 +1,10 @@
+#include <Boards.h>
+#include <Firmata.h>
+#include <FirmataConstants.h>
+#include <FirmataDefines.h>
+#include <FirmataMarshaller.h>
+#include <FirmataParser.h>
+
 #include <EEPROM.h>
 
 #define TIME_RESOLUTION 10
@@ -10,15 +17,19 @@ byte ledsCount = 1;
 bool ledsOn = true;
 byte currentLedVal = 0;
 byte expectedLedVal = 100;
+byte expectedDimLedValue = 20;
 
-int detectors[] = {A0, A1};
-byte detectorsCount = 2;
+int detectors[] = {A0};
+byte detectorsCount = 1;
 bool isDetected = false;
+bool wasDetected = true;
+bool isMasterOn = false;
 
-int autoOffCounter = INITIAL_AUTO_OFF_VAL;
+unsigned int autoOffCounter = INITIAL_AUTO_OFF_VAL;
 
 unsigned long timeNow = 0;
 
+int masterPin = 6;
 int incPin = 7;
 int decPin = 8;
 
@@ -32,15 +43,18 @@ void setup()
   {
     EEPROM.write(0, 1);
     EEPROM.write(1, expectedLedVal);
+    EEPROM.write(2, expectedDimLedValue);
   }
   else
   {
     expectedLedVal = EEPROM.read(1);
+    expectedDimLedValue = EEPROM.read(2);
   }
 
   pinMode(signalPin, OUTPUT);
   pinMode(incPin, INPUT);
   pinMode(decPin, INPUT);
+  pinMode(masterPin, INPUT);
 
   for (byte i = 0; i < ledsCount; i++)
   {
@@ -101,39 +115,46 @@ void handleSignal()
 
 void handleIncDec()
 {
+  isMasterOn = digitalRead(masterPin) == HIGH;
   bool wasChanged = false;
+  byte *ledVal = isMasterOn ? &expectedLedVal : &expectedDimLedValue;
 
   if (digitalRead(incPin) == HIGH && digitalRead(decPin) == HIGH)
   {
     ledsOn = true;
     currentLedVal = 0;
   }
-  else if (expectedLedVal < MAX_VAL && digitalRead(incPin) == HIGH)
+  else if (*ledVal < MAX_VAL && digitalRead(incPin) == HIGH)
   {
     wasChanged = true;
     ledsOn = true;
-    expectedLedVal += 5;
+    *ledVal += 5;
   }
-  else if (expectedLedVal > 5 && digitalRead(decPin) == HIGH)
+  else if (*ledVal > 5 && digitalRead(decPin) == HIGH)
   {
     wasChanged = true;
     ledsOn = true;
-    expectedLedVal -= 5;
-    currentLedVal = expectedLedVal > 0 ? expectedLedVal - 5 : 0;
+    *ledVal -= 5;
+    currentLedVal = *ledVal > 0 ? *ledVal - 5 : 0;
   }
 
   if (wasChanged)
   {
     autoOffCounter = INITIAL_AUTO_OFF_VAL;
+    if(!isMasterOn)
+    {
+      wasDetected = true;
+    }
     EEPROM.write(1, expectedLedVal);
+    EEPROM.write(2, expectedDimLedValue);
     delay(100);
   }
 }
 
 void handleAutoOnOff()
-{
+{  
   handleDetection();
-  if (ledsOn && !isDetected)
+  if (ledsOn && !isDetected && !isMasterOn)
   {
     autoOffCounter++;
   }
@@ -143,15 +164,19 @@ void handleAutoOnOff()
     autoOffCounter = 0;
   }
 
-  if (!ledsOn && isDetected)
+  if (!ledsOn && (isDetected || isMasterOn))
   {
     ledsOn = true;
   }
 
-  if (autoOffCounter >= AUTO_OFF_MAX_VAL)
+  if (autoOffCounter >= AUTO_OFF_MAX_VAL || !wasDetected)
   {
-    ledsOn = false;
+    if(!isMasterOn)
+    {
+      ledsOn = false;      
+    }
     autoOffCounter = 0;
+    wasDetected = false;
     digitalWrite(signalPin, LOW);
   }
 }
@@ -164,10 +189,11 @@ void handleDetection()
     {
       digitalWrite(signalPin, HIGH);
       isDetected = true;
+      wasDetected = true;
       return;
     }
   }
-
+  
   isDetected = false;
 }
 
@@ -175,9 +201,21 @@ void handleLeds()
 {
   bool wasChanged = false;
 
-  if (ledsOn && currentLedVal < expectedLedVal)
+  if (ledsOn && isMasterOn && currentLedVal < expectedLedVal)
   {
     currentLedVal += 1;
+    wasChanged = true;
+  }
+
+  if(ledsOn && !isMasterOn && currentLedVal < expectedDimLedValue)
+  {
+    currentLedVal += 1;
+    wasChanged = true;
+  }
+
+  if(ledsOn && !isMasterOn && currentLedVal > expectedDimLedValue)
+  {
+    currentLedVal -= 1;
     wasChanged = true;
   }
 
