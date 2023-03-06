@@ -145,7 +145,7 @@ void ESBDriver::handleTimeEvents()
         if (this->timer % 600 == 0)
         {
             this->getTime();
-            this->setWorkType();
+            //this->setWorkType();
         }
     }
 }
