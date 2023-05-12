@@ -18,23 +18,76 @@ void SocketDriver::begin()
 {
     Serial.begin(9600);
 
-    Serial.println("SocketDriver");
+    Serial.println("HighPowerSocketDriver");
 
     WiFi.mode(WIFI_STA);
     WiFi.config(this->ip, this->gateway, this->subnet, this->dns1, this->dns2);
     WiFi.begin(this->ssid, this->pwd);
 
+    int c = 0;
+    uint8_t s;
     // Wait for connection
     while (WiFi.status() != WL_CONNECTED)
     {
+        c++;
+
+        if (c > 20)
+        {
+            Serial.println("");
+            s = WiFi.status();
+
+            switch (s)
+            {
+            case WL_NO_SHIELD:
+                Serial.println("shield status");
+                break;
+
+            case WL_IDLE_STATUS:
+                Serial.println("idle status");
+                break;
+
+            case WL_NO_SSID_AVAIL:
+                Serial.println("no ssid available");
+                break;
+
+            case WL_SCAN_COMPLETED:
+                Serial.println("scan completed");
+                break;
+
+            case WL_CONNECT_FAILED:
+                Serial.println("connect failed");
+                break;
+
+            case WL_CONNECTION_LOST:
+                Serial.println("connection lost");
+                break;
+
+            case WL_DISCONNECTED:
+                Serial.println("disconnected");
+                break;
+
+            default:
+                Serial.print("unknown status ");
+                Serial.println(s);
+            }
+
+            c = 0;
+        }
         delay(500);
+        Serial.print(".");
     }
 
     this->wifiDisconnectHandler = WiFi.onStationModeDisconnected(std::bind(&SocketDriver::onWifiDisconnect, this, std::placeholders::_1));
     this->wifiConnectedHandler = WiFi.onStationModeConnected(std::bind(&SocketDriver::onWifiConnected, this, std::placeholders::_1));
 
+    Serial.println("");
+    Serial.print("Connected to ");
+    Serial.println(ssid);
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+
     this->isConnected = true;
-    MDNS.begin("esp8266");
+    MDNS.begin("HighPowerSocketDriver");
 
     this->server.on("/", std::bind(&SocketDriver::handleRoot, this));
     this->server.on("/ota", std::bind(&SocketDriver::handleOTA, this));
@@ -138,7 +191,7 @@ void SocketDriver::handleTimeEvents()
         }
 
         // 1min
-        if (this->timer % 600 == 0)
+        if (this->timer % 600 == 0 && !starting)
         {
             this->handlePvVoltage(true);
         }
@@ -167,7 +220,7 @@ void SocketDriver::handleReset()
 
 void SocketDriver::handleRoot()
 {
-    String src = "<div>Socket Driver is ";
+    String src = "<div>High power Socket Driver is ";
     src += (this->isOn ? "on" : "off");
     src += "</div>";
     src += "<div>Status: ";
@@ -217,16 +270,18 @@ void SocketDriver::handlePvVoltage(bool checkOn)
                 Serial.println(payload);
 
                 int pvVoltage = payload.substring(64, 67).toInt();
-                int pvPower = payload.substring(97, 102).toInt();
+                long pvPower = payload.substring(97, 102).toInt();
+                long activePower = payload.substring(27, 31).toInt();
                 Serial.println(pvVoltage);
                 Serial.println(pvPower);
+                Serial.println(activePower);
 
-                if (checkOn && (pvVoltage >= 260 || (pvVoltage > 130 && pvPower > 10)))
+                if (checkOn && (pvVoltage >= 260))
                 {
                     this->isOn = true;
                     this->status = "Ok";
                 }
-                else if (!checkOn && pvVoltage < 260 && pvPower < 10)
+                else if (!checkOn && pvPower < (activePower - 100UL))
                 {
                     this->isOn = false;
                     this->status = "low PV input";

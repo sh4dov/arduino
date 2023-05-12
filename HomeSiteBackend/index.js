@@ -3,7 +3,7 @@ const http = require('http');
 
 const app = express();
 
-const sockets = ["192.168.100.51", "192.168.100.53"];
+const sockets = ["192.168.100.51", "192.168.100.53", "192.168.100.54"];
 
 const drivers = [
     {
@@ -97,6 +97,11 @@ const drivers = [
     }
 ];
 
+const paramsInfo = {
+    value: "",
+    validDate: null
+};
+
 app.use((err, req, res, next) => {
     res
     .status(err.status || 500)
@@ -107,41 +112,76 @@ app.get('/', (request, response) => {
     response.send("Home Site backend");    
 });
 
+app.get("/api/paramsCache", (request, response) =>{
+    var now = new Date();
+    if(paramsInfo.validDate && paramsInfo.validDate > now){
+        response.send(paramsInfo.value);
+        return;
+    }
+
+    var data = ""
+    http.get("http://192.168.100.49/params", res => {
+        res.on("data", chunk => data += chunk);
+        res.on("error", err => console.log(err));
+        res.on("end", () => {            
+            paramsInfo.value = data;
+            var now = new Date();
+            paramsInfo.validDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1, now.getSeconds(), now.getMilliseconds());
+            response.send(paramsInfo.value);
+        });
+    });
+});
+
+parsParams = (data) => {
+    const params = data.split(' ');
+    const result = {
+        pv: {
+            voltage: params[13],
+            amp: params[12],
+            watt: params[19]
+        },
+        acu : {
+            voltage: params[8],
+            discharge: params[15],
+            charging: params[9],
+            soc: params[10]
+        },
+        load: params[6],
+        ac: {
+            voltage: params[0],
+            hz: params[1]
+        },
+        ac_out: {
+            voltage: params[2],
+            hz: params[3]
+        },
+        power: {
+            apparent: params[4],
+            active: params[5]
+        },
+        temp: params[11],
+        v_bus: params[7]
+    }
+        return result;
+}
+
 app.get("/api/params", (request, response) => {
+    var now = new Date();
+    if(paramsInfo.validDate && paramsInfo.validDate > now){
+        const result = parsParams(paramsInfo.value);
+            response.send(JSON.stringify(result));
+        return;
+    }
+
     var data = ""
     http.get("http://192.168.100.49/params", res => {
         res.on("data", chunk => data += chunk);
         res.on("error", err => console.log(err));
         res.on("end", () => {
-            const params = data.split(' ');
-            const result = {
-                pv: {
-                    voltage: params[13],
-                    amp: params[12],
-                    watt: params[19]
-                },
-                acu : {
-                    voltage: params[8],
-                    discharge: params[15],
-                    charging: params[9],
-                    soc: params[10]
-                },
-                load: params[6],
-                ac: {
-                    voltage: params[0],
-                    hz: params[1]
-                },
-                ac_out: {
-                    voltage: params[2],
-                    hz: params[3]
-                },
-                power: {
-                    apparent: params[4],
-                    active: params[5]
-                },
-                temp: params[11],
-                v_bus: params[7]
-            }
+            paramsInfo.value = data;
+            var now = new Date();
+            paramsInfo.validDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1, now.getSeconds(), now.getMilliseconds());
+            const result = parsParams(data);
             response.send(JSON.stringify(result));
         });
     });
@@ -208,10 +248,10 @@ app.get("/api/stats", (request, response) =>{
 });
 
 app.get("/api/sockets", (request, response) => {    
-    const result = [null, null];
+    const result = [null, null, null];
 
     sockets.forEach((ip, id) => {
-        http.get("http://" + ip, res => {
+        var req = http.get("http://" + ip, res => {
             let data = "";
             res.on("data", chunk => data += chunk);
             res.on("error", err => console.log(err));
@@ -227,6 +267,20 @@ app.get("/api/sockets", (request, response) => {
                     response.json(result);
                 }
             });
+        });
+
+        req.on("error", err => {
+            console.log("err");
+            console.log(err);
+            let socket = {
+                id: id,
+                data: ip + " offline"
+            };
+            result[id] = socket;
+
+            if(result.every(r => !!r)){
+                response.json(result);
+            }
         });
     });
 });
@@ -302,10 +356,13 @@ app.get("/api/sbu", (request, response) => {
 
 app.get("/api/drivers", (request, response) => {
     var result = [];
+    console.log("getting drivers...");
+
     drivers.forEach((d, id) => {
         result.push(null);
+        console.log(`getting ${d.ip}`);
 
-        http.get("http://" + d.ip + "/conf", res => {
+        var req = http.get("http://" + d.ip + "/conf", res => {
             let data = "";
             res.on("data", chunk => data += chunk);
             res.on("error", err => {
@@ -333,6 +390,17 @@ app.get("/api/drivers", (request, response) => {
                     response.json(result);
                 }
             });
+        });
+        req.on("error", err => {
+            console.log("err");
+            console.log(err);
+            d.error = err;
+            d.online = false;
+            result[id] = d;
+
+            if(result.every(r => !!r)){
+                response.json(result);
+            }
         });
     });
 });
