@@ -239,11 +239,13 @@ void LightsDriver::handleTimeEvents()
 void LightsDriver::handleLeds()
 {
     int step = 1;
+    Serial.println("handling leds");
 
     for(int i = 0; i < this->ledsCount; i++)
     {
         if (this->isDarkTime() && this->state[i] > 0)
         {
+            Serial.println("Turning leds off");
             int v = this->vals[i];
 
             while(v > 0)
@@ -254,9 +256,10 @@ void LightsDriver::handleLeds()
             }
 
             this->state[i] = 0;
-        } else if (this->state[i] == 0) {
+        } else if (!this->isDarkTime() && this->state[i] == 0) {
             int v = 0;
 
+            Serial.println("Turning leds on");
             while(v < this->vals[i])
             {
                 v = v + step > this->vals[i] ? this->vals[i] : v + step;
@@ -270,7 +273,7 @@ void LightsDriver::handleLeds()
 
 bool LightsDriver::isDarkTime()
 {
-    if (!this->isConnected || (this->timeClient.getHours() < 10 || this->timeClient.getHours() >= 19))
+    if (!this->isConnected || (this->timeClient.getHours() < 10 || this->timeClient.getHours() >= 18))
     {
         return true;
     }
