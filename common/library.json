@@ -1,0 +1,26 @@
+{
+    "name": "sh4dov_common",
+    "version": "1.0.0",
+    "description": "Common classes",
+    "keywords": "common",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/sh4dov/arduino"
+    },
+    "authors":
+    [
+      {
+        "name": "",
+        "email": "",
+        "url": "https://github.com/sh4dov/arduino"
+      }
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/sh4dov/arduino",
+    "dependencies": {
+      "ownername/print": "~1.3.0"
+    },
+    "frameworks": "arduino",
+    "platforms": "*"
+  }

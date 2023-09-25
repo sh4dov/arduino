@@ -9,3 +9,4 @@ acu_driver8266/pwd.h
 acu_driver8266/out
 FishTankLedDriver/src/pwd.h
 FishTankLedDriver2/src/pwd.h
+common/pwd.h
