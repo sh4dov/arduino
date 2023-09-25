@@ -9,10 +9,11 @@
 #include <TimeService.h>
 #include <Logger.h>
 #include <LedHandler.h>
+#include <WiFiHandler.h>
 
 #include "htmlSrc.h"
 
-class LightDriver {
+class LightDriver : public IDriver {
     private:
         LedHandler ledHandler;
         AsyncWebServer server;

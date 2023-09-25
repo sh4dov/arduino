@@ -15,62 +15,18 @@
 TimeService timeService;
 WiFiUDP ntpUDP;
 Logger logger;
-LightDriver *driver;
-
-WiFiEventHandler wifiConnectHandler;
-WiFiEventHandler wifiDisconnectHandler;
-
-void onWifiDisconnect(const WiFiEventStationModeDisconnected &event)
-{
-  logger.println("Disconnected");
-  driver->setDisconnected();
-  WiFi.disconnect();
-  WiFi.begin(ssid, password);
-}
-
-void onWifiConnected(const WiFiEventStationModeConnected &event)
-{
-  logger.println("Connected");
-  driver->setConnected();
-}
-
-void setupWiFi()
-{
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-
-  while(WiFi.status() != WL_CONNECTED)
-  {
-    Serial.print(".");
-  }
-
-  wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
-  wifiConnectHandler = WiFi.onStationModeConnected(onWifiConnected);
-
-  Serial.println("");
-  logger.print("Connected to ");
-  logger.println(ssid);
-  logger.print("IP address: ");
-  logger.println(WiFi.localIP().toString());
-}
-
-void setupNtp()
-{
-  timeService.begin();
-
-  logger.println("Current time: " + timeService.toString());
-}
+LightDriver driver(&logger, &timeService);
+WiFiHandler wifiHandler(&logger, &driver, ssid, password);
 
 void setup() {
   Serial.begin(115200);
-  setupWiFi();
-  setupNtp();
+  
+  wifiHandler.setup();
 
-  driver = new LightDriver(&logger, &timeService);
-  driver->setConnected();
-  driver->setup();  
+  timeService.begin();
+  logger.println("Current time: " + timeService.toString());
 }
 
 void loop() {
-  driver->handle();
+  wifiHandler.handle();
 }
