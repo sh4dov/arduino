@@ -155,14 +155,14 @@ void LightDriver::handleTimedEvents()
         return;
     }
 
-    if(this->ledHandler.getValue() > 0 && (tm->tm_hour < 10 || tm->tm_hour > 19))
+    if(this->ledHandler.getValue() > 0 && (tm->tm_hour < 10 || tm->tm_hour >= 19))
     {
         this->logger->println("Turn off led (time)");
         this->ledHandler.turnOff();
     }
-    else if(!this->ledHandler.isOn())
+    else if(!this->ledHandler.isOn() && tm->tm_hour >= 10 && tm->tm_hour < 19)
     {
-        this->logger->println("Turn on led (time)" + String(this->ledHandler.getValue()));
+        this->logger->println("Turn on led (time)");
         this->ledHandler.turnOn();
     }
 }
