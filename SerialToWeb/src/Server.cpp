@@ -41,9 +41,11 @@ void Server::handle()
 
 void Server::handleRoot(AsyncWebServerRequest *request)
 {
-    String src = "<div>SerialToWeb logs:<div>";
+    String src = "<html><head><script>setTimeout(function(){window.location.reload(1);}, 5000);</script></head><body><div>SerialToWeb logs:<div>";
 
     src += logger->getLog();
+
+    src += "</body></html>";
 
     request->send(200, "text/html", src);
 }

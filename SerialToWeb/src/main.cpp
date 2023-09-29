@@ -8,7 +8,7 @@
 
 #include "pwd.h"
 
-Logger logger(true, 1500U);
+Logger logger(true, 5000U);
 Server server(&logger);
 WiFiHandler wifiHandler(&logger, &server, ssid, password);
 
