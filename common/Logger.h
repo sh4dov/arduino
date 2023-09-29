@@ -5,9 +5,11 @@
 class Logger {
     private:
         String log = "";
-        unsigned int maxLog = 1000;
+        bool logToSerial;
+        unsigned int maxLog;        
 
     public:
+        Logger(bool logToSerial = true, unsigned int maxLog = 1000) : logToSerial(logToSerial), maxLog(maxLog) {}
         void print(String str);
         void print(const char c[]);
         void println(String str);

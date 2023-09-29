@@ -8,10 +8,10 @@
 class IDriver
 {
     public:
-        virtual void setDisconnected();
-        virtual void setConnected();
-        virtual void setup();
-        virtual void handle();
+        virtual void setDisconnected() {}
+        virtual void setConnected() {}
+        virtual void setup() {}
+        virtual void handle() {}
 };
 
 class WiFiHandler

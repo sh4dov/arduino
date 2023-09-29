@@ -2,7 +2,11 @@
 
 void Logger::print(String str)
 {
-    Serial.print(str);
+    if(logToSerial)
+    {
+        Serial.print(str);
+    }
+    
     str = str;
 
     if (str.length() > this->maxLog)

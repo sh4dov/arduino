@@ -18,9 +18,18 @@
     ],
     "license": "MIT",
     "homepage": "https://github.com/sh4dov/arduino",
-    "dependencies": {
-      "ownername/print": "~1.3.0"
-    },
+    "dependencies": [
+      {
+        "owner": "ottowinter",
+        "name": "ESPAsyncWebServer-esphome",
+        "platforms": "espressif8266"
+      },
+      {
+        "owner": "sstaub",
+        "name": "TickTwo",
+        "platforms": "espressif8266"
+      }]
+    ,
     "frameworks": "arduino",
     "platforms": "*"
   }
