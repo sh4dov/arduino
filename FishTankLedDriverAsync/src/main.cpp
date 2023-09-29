@@ -13,7 +13,6 @@
 #include "pwd.h"
 
 TimeService timeService;
-WiFiUDP ntpUDP;
 Logger logger;
 LightDriver driver(&logger, &timeService);
 WiFiHandler wifiHandler(&logger, &driver, ssid, password);

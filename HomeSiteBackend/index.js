@@ -1,5 +1,6 @@
 const express = require('express')
 const http = require('http');
+const { Readable } = require('stream');
 
 const app = express();
 
@@ -280,6 +281,78 @@ app.get("/api/sockets", (request, response) => {
 
             if(result.every(r => !!r)){
                 response.json(result);
+            }
+        });
+    });
+});
+
+class RandomNumberStream extends Readable {
+    constructor(options) {
+      super(options);
+      this.count = 0;
+    }
+  
+    _read(size) {
+      // Generowanie losowych liczb co 1 sekundę
+      const interval = setInterval(() => {
+        if (this.count >= 10) {
+          clearInterval(interval);
+          //this.push(null); // Koniec strumienia
+        } else {
+          const randomNumber = Math.floor(Math.random() * 100);
+          this.push(`${randomNumber}\n`);
+          this.count++;
+        }
+      }, 1000);
+    }
+  }
+
+app.get("/api/sockets2", (request, response) => {    
+    const result = [null, null, null];
+
+    response.writeHead(200, {
+        'Content-Type': 'text/plain',
+        'Transfer-Encoding': 'chunked'
+    });
+
+    const stream = new RandomNumberStream();
+
+    stream.pipe(response);
+
+    sockets.forEach((ip, id) => {
+        var req = http.get("http://" + ip, res => {
+            let data = "";
+            res.on("data", chunk => data += chunk);
+            res.on("error", err => console.log(err));
+            res.on("end", () => {
+                let socket = {
+                    id: id,
+                    data: data
+                };
+
+                result[id] = socket;
+
+                stream.push(JSON.stringify(socket));
+
+                if(result.every(r => !!r)){
+                    stream.push(null);
+                }
+            });
+        });
+
+        req.on("error", err => {
+            console.log("err");
+            console.log(err);
+            let socket = {
+                id: id,
+                data: ip + " offline"
+            };
+            result[id] = socket;
+
+            stream.push(JSON.stringify(socket));
+
+            if(result.every(r => !!r)){
+                stream.push(null);
             }
         });
     });
