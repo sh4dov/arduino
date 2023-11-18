@@ -2,8 +2,8 @@
 
 Server::Server(Logger *logger) :
     server(80),
-    checkParamsTimer(std::bind(&Server::handleCheckParamsEvent, this), 1000 * 60),
-    checkPinTimer(std::bind(&Server::handlePinEvent, this), 1000 * 10),
+    checkParamsTimer(std::bind(&Server::handleCheckParamsEvent, this), 1000 * 30),
+    checkPinTimer(std::bind(&Server::handlePinEvent, this), 1000 * 60),
     logger(logger),
     handler(logger)
 {
@@ -97,7 +97,6 @@ void Server::turnOn()
     isOn = true;
     analogWrite(pin, 255);
     logger->println("turn on");
-    handleCheckParamsEvent();
 }
 
 void Server::turnOff()
