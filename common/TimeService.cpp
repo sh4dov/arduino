@@ -4,10 +4,10 @@ void TimeService::begin()
 {
     configTzTime(MYTZ, "pool.ntp.org");
     this->_now = time(nullptr);
-    while(this->_now < SECS_YR_2000) {
-        delay(100);
-        this->_now = time(nullptr);
-    }  
+    if(!this->isCorrect())
+    {
+        this->update();
+    }
 }
 
 tm* TimeService::now()
@@ -43,4 +43,9 @@ String TimeService::toString(tm* tm)
 void TimeService::update()
 {
     this->_now = time(nullptr);
+}
+
+bool TimeService::isCorrect()
+{
+    return this->_now > SECS_YR_2000;
 }

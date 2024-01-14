@@ -5,6 +5,8 @@
 
 #include <Logger.h>
 
+#define LED_PIN 2
+
 class IDriver
 {
     public:
@@ -19,6 +21,9 @@ class WiFiHandler
     private:
         Logger *logger;
         IDriver *driver;
+        IPAddress *ip;
+        IPAddress *gateway;
+        IPAddress subnet;
         String ssid;
         String password;
         WiFiEventHandler wifiDisconnectHandler;
@@ -29,6 +34,7 @@ class WiFiHandler
 
     public:
         WiFiHandler(Logger *logger, IDriver *driver, String ssid, String password);
+        WiFiHandler(Logger *logger, IDriver *driver, String ssid, String password, IPAddress *ip, IPAddress *gateway);
         void setup();
         void handle();
 };

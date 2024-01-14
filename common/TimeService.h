@@ -11,13 +11,13 @@
 
 class TimeService {
     private:
-        time_t _now;
-
-        void update();
+        time_t _now;        
 
     public:
+        void update();
         void begin(); 
         tm* now();   
+        bool isCorrect();
         String toString();
         String toString(tm* tm);
 };

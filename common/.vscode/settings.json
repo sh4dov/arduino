@@ -1,0 +1,12 @@
+{
+    "[yaml]": {
+        "editor.tabSize": 4
+    },
+    "editor.detectIndentation": true,
+    "C_Cpp.vcFormat.indent.accessSpecifiers": true,
+    "C_Cpp.vcFormat.indent.braces": true,
+    "C_Cpp.vcFormat.indent.caseContentsWhenBlock": true,
+    "C_Cpp.vcFormat.indent.caseLabels": true,
+    "C_Cpp.vcFormat.indent.preserveComments": true,
+    "C_Cpp.vcFormat.indent.preserveWithinParentheses": true
+}
