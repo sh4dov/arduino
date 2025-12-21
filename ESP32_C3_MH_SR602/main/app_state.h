@@ -1,12 +1,19 @@
 #ifndef APP_STATE_H
 #define APP_STATE_H
 
+#include <stdbool.h> // For bool type in app_config_t
+#include "nvs_manager.h" // For app_config_t definition
+
 // Application operational modes
 typedef enum {
     MODE_PROVISIONING,
     MODE_CONNECTING,
     MODE_NORMAL,
 } app_mode_t;
+
+// Global application state variables
+extern app_mode_t g_app_mode;
+extern app_config_t g_app_config;
 
 // LED indicator patterns
 typedef enum {

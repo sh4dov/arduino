@@ -21,6 +21,7 @@
 #define PROV_AP_SSID "new-motion-sensor"
 
 static const char *TAG = "app_main";
+static bool s_initial_scan_kicked = false;
 
 // Global application configuration (will be populated from NVS)
 app_config_t g_app_config;
@@ -68,6 +69,15 @@ static void on_wifi_event(app_mode_t mode, esp_event_base_t event_base, int32_t 
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_START) {
         ESP_LOGI(TAG, "Wi-Fi AP started. Starting web server.");
         web_server_start(); // Start web server for provisioning
+
+        // If not provisioned, do an initial Wi-Fi scan so '/' can show networks immediately.
+        if (!g_app_config.provisioned && !s_initial_scan_kicked) {
+            s_initial_scan_kicked = true;
+            esp_err_t scan_err = wifi_manager_scan_networks_async();
+            if (scan_err != ESP_OK) {
+                ESP_LOGW(TAG, "Failed to start initial Wi-Fi scan: %s", esp_err_to_name(scan_err));
+            }
+        }
     }
 }
 
@@ -76,12 +86,11 @@ void app_main(void)
 {
     ESP_LOGI(TAG, "Application startup.");
 
-    // Initialize global application configuration with defaults
-    memset(&g_app_config, 0, sizeof(app_config_t));
-    strncpy(g_app_config.device_name, "ESP32-Sensor", MAX_DEVICE_NAME_LEN - 1);
+    // Initialize default configuration
+    strncpy(g_app_config.device_name, "esp32-sensor", MAX_DEVICE_NAME_LEN - 1);
     g_app_config.device_name[MAX_DEVICE_NAME_LEN - 1] = '\0';
-    strncpy(g_app_config.host_ip, "0.0.0.0", MAX_HOST_IP_LEN - 1); // Default to a non-routable IP
-    g_app_config.host_ip[MAX_HOST_IP_LEN - 1] = '\0';
+    strncpy(g_app_config.host_addr, "", MAX_HOST_ADDR_LEN - 1); // Default to empty
+    g_app_config.host_addr[MAX_HOST_ADDR_LEN - 1] = '\0';
 
     // Initialize components
     ESP_ERROR_CHECK(nvs_manager_init());
@@ -92,7 +101,7 @@ void app_main(void)
     esp_err_t err = nvs_manager_load_config(&g_app_config);
     // Always enforce null-termination in case of corrupted NVS or partial writes.
     g_app_config.device_name[MAX_DEVICE_NAME_LEN - 1] = '\0';
-    g_app_config.host_ip[MAX_HOST_IP_LEN - 1] = '\0';
+    g_app_config.host_addr[MAX_HOST_ADDR_LEN - 1] = '\0';
     g_app_config.wifi_ssid[MAX_WIFI_SSID_LEN - 1] = '\0';
     g_app_config.wifi_password[MAX_WIFI_PASS_LEN - 1] = '\0';
 
@@ -100,16 +109,16 @@ void app_main(void)
     bool config_valid = (err == ESP_OK && 
                         g_app_config.provisioned &&
                         strlen(g_app_config.device_name) > 0 &&
-                        strlen(g_app_config.host_ip) > 0 &&
+                        strlen(g_app_config.host_addr) > 0 &&
                         strlen(g_app_config.wifi_ssid) > 0);
 
     if (config_valid) {
         g_app_mode = MODE_CONNECTING;
         ESP_LOGI(TAG, "Device already provisioned. Starting Wi-Fi station.");
         ESP_LOGI(TAG, "Config: Device='%s', Host='%s', SSID='%s'", 
-                 g_app_config.device_name, g_app_config.host_ip, g_app_config.wifi_ssid);
+                 g_app_config.device_name, g_app_config.host_addr, g_app_config.wifi_ssid);
         wifi_manager_init(on_wifi_event, g_app_config.device_name);
-        wifi_manager_start_sta(g_app_config.wifi_ssid, g_app_config.wifi_password);
+        wifi_manager_start_sta(&g_app_config);
     } else {
         g_app_mode = MODE_PROVISIONING;
         if (err == ESP_OK && g_app_config.provisioned) {

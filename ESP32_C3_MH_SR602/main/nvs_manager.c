@@ -29,12 +29,14 @@ esp_err_t nvs_manager_load_config(app_config_t *config) {
         return err;
     }
 
-    size_t len = MAX_DEVICE_NAME_LEN;
+    size_t len;
+
+    len = MAX_DEVICE_NAME_LEN;
     err = nvs_get_str(nvs_handle, "device_name", config->device_name, &len);
     if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND) goto exit;
 
-    len = MAX_HOST_IP_LEN;
-    err = nvs_get_str(nvs_handle, "host_ip", config->host_ip, &len);
+    len = MAX_HOST_ADDR_LEN;
+    err = nvs_get_str(nvs_handle, "host_addr", config->host_addr, &len);
     if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND) goto exit;
 
     len = MAX_WIFI_SSID_LEN;
@@ -56,9 +58,9 @@ err = nvs_get_str(nvs_handle, "wifi_pass", config->wifi_password, &len);
     }
 
     // Use bounded string prints to remain safe even if caller forgot to pre-initialize buffers.
-    ESP_LOGI(TAG, "Configuration loaded: Device Name='%.*s', Host IP='%.*s', SSID='%.*s', Provisioned=%d",
+    ESP_LOGI(TAG, "Configuration loaded: Device Name='%.*s', Host Addr='%.*s', SSID='%.*s', Provisioned=%d",
              MAX_DEVICE_NAME_LEN - 1, config->device_name,
-             MAX_HOST_IP_LEN - 1, config->host_ip,
+             MAX_HOST_ADDR_LEN - 1, config->host_addr,
              MAX_WIFI_SSID_LEN - 1, config->wifi_ssid,
              config->provisioned);
 
@@ -81,8 +83,11 @@ esp_err_t nvs_manager_save_config(const app_config_t *config) {
         return err;
     }
 
+    ESP_LOGI(TAG, "Saving config: device_name=%s, host_addr=%.*s, wifi_ssid=%s",
+             config->device_name, MAX_HOST_ADDR_LEN - 1, config->host_addr,
+             config->wifi_ssid);
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "device_name", config->device_name));
-    ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "host_ip", config->host_ip));
+    ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "host_addr", config->host_addr));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "wifi_ssid", config->wifi_ssid));
     ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "wifi_pass", config->wifi_password));
     ESP_ERROR_CHECK(nvs_set_i32(nvs_handle, "provisioned", (int32_t)config->provisioned));

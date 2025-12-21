@@ -6,14 +6,14 @@
 
 // Maximum lengths for configurable strings
 #define MAX_DEVICE_NAME_LEN 32
-#define MAX_HOST_IP_LEN 16 // "255.255.255.255" + null terminator
+#define MAX_HOST_ADDR_LEN 256 // Accommodate hostnames with optional port
 #define MAX_WIFI_SSID_LEN 32
 #define MAX_WIFI_PASS_LEN 64
 
 // Structure to hold all configurable device settings
 typedef struct {
     char device_name[MAX_DEVICE_NAME_LEN];
-    char host_ip[MAX_HOST_IP_LEN];
+    char host_addr[MAX_HOST_ADDR_LEN];
     char wifi_ssid[MAX_WIFI_SSID_LEN];
     char wifi_password[MAX_WIFI_PASS_LEN];
     bool provisioned; // Flag to indicate if initial provisioning has occurred

@@ -66,8 +66,8 @@ static void http_post_task(void *pvParameters) {
     motion_status_t status = params->status;
     free(params); // Free the parameters struct immediately
 
-    char post_url[sizeof(POST_URL_FORMAT) + MAX_HOST_IP_LEN];
-    snprintf(post_url, sizeof(post_url), POST_URL_FORMAT, g_app_config.host_ip);
+    char post_url[sizeof(POST_URL_FORMAT) + MAX_HOST_ADDR_LEN];
+    snprintf(post_url, sizeof(post_url), POST_URL_FORMAT, g_app_config.host_addr);
 
     ESP_LOGI(TAG, "Sending motion update to %s. State: %d", post_url, status);
 
@@ -130,8 +130,8 @@ static void http_post_task(void *pvParameters) {
 }
 
 void host_client_send_motion_update(motion_status_t status) {
-    if (strlen(g_app_config.host_ip) == 0) {
-        ESP_LOGW(TAG, "Host IP not configured. Skipping motion update.");
+    if (strlen(g_app_config.host_addr) == 0) {
+        ESP_LOGW(TAG, "Host address not configured. Skipping motion update.");
         return;
     }
 
