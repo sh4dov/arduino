@@ -44,7 +44,7 @@ esp_err_t nvs_manager_load_config(app_config_t *config) {
     if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND) goto exit;
 
     len = MAX_WIFI_PASS_LEN;
-err = nvs_get_str(nvs_handle, "wifi_pass", config->wifi_password, &len);
+    err = nvs_get_str(nvs_handle, "wifi_pass", config->wifi_password, &len);
     if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND) goto exit;
 
     int32_t provisioned = 0;

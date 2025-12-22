@@ -175,10 +175,10 @@ const char* PROV_HTML_FORM = R"rawliteral(
             <button type="button" class="secondary" onclick="refreshWifiList()">Scan Wi-Fi</button>
 
             <label for="wifi_ssid">Wi-Fi SSID:</label>
-            <input type="text" id="wifi_ssid" name="wifi_ssid" readonly required>
+            <input type="text" id="wifi_ssid" name="wifi_ssid" value="%.*s" required>
 
             <label for="wifi_password">Wi-Fi Password:</label>
-            <input type="password" id="wifi_password" name="wifi_password">
+            <input type="password" id="wifi_password" name="wifi_password" value="%.*s">
 
             <input type="submit" value="Save Configuration">
         </form>
@@ -294,7 +294,9 @@ static esp_err_t prov_root_get_handler(httpd_req_t *req) {
              "/save", // Form action for provisioning
              MAX_DEVICE_NAME_LEN - 1, (g_app_config.provisioned ? g_app_config.device_name : ""),
              MAX_HOST_ADDR_LEN - 1, (g_app_config.provisioned ? g_app_config.host_addr : ""),
-             wifi_options);
+             wifi_options,
+             MAX_WIFI_SSID_LEN - 1, (g_app_config.provisioned ? g_app_config.wifi_ssid : ""),
+             MAX_WIFI_PASS_LEN - 1, (g_app_config.provisioned ? g_app_config.wifi_password : ""));
 
     // Avoid browser caching an older version of the provisioning page.
     httpd_resp_set_hdr(req, "Cache-Control", "no-store");
@@ -605,7 +607,9 @@ static esp_err_t normal_edit_get_handler(httpd_req_t *req) {
              "/update", // Form action for updating
              MAX_DEVICE_NAME_LEN - 1, g_app_config.device_name,
              MAX_HOST_ADDR_LEN - 1, g_app_config.host_addr,
-             wifi_options);
+             wifi_options,
+             MAX_WIFI_SSID_LEN - 1, g_app_config.wifi_ssid,
+             MAX_WIFI_PASS_LEN - 1, g_app_config.wifi_password);
 
     httpd_resp_set_hdr(req, "Cache-Control", "no-store");
     httpd_resp_set_hdr(req, "Pragma", "no-cache");
