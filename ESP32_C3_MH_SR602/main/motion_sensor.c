@@ -22,14 +22,7 @@ static void motion_sensor_task(void* arg) {
     bool motion_active = (last_sensor_level == 1);
     s_current_status = motion_active ? MOTION_DETECTED : MOTION_NONE;
 
-    // Initial report if motion is already active
-    if (s_motion_callback && motion_active) {
-        s_motion_callback(MOTION_DETECTED);
-        ESP_LOGI(TAG, "Initial motion detected state.");
-    } else if (s_motion_callback && !motion_active) {
-        s_motion_callback(MOTION_NONE);
-        ESP_LOGI(TAG, "Initial no motion detected state.");
-    }
+    
 
 
     while(1) {

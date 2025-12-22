@@ -51,7 +51,7 @@ static void on_wifi_event(app_mode_t mode, esp_event_base_t event_base, int32_t 
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ESP_LOGI(TAG, "Wi-Fi connected. IP address received.");
         g_app_mode = MODE_NORMAL;
-        led_indicator_set_pattern(LED_SOLID_OFF); // Idle
+        on_motion_event(motion_sensor_get_status()); // Sync LED with current sensor state
         
         // Start mDNS now that we have an IP
         mdns_service_init(g_app_config.device_name);

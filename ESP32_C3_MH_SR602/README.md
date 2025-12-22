@@ -5,7 +5,7 @@
 
 (See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-This example demonstrates how to blink a LED by using the GPIO driver or using the [led_strip](https://components.espressif.com/component/espressif/led_strip) library if the LED is addressable e.g. [WS2812](https://cdn-shop.adafruit.com/datasheets/WS2812B.pdf). The `led_strip` library is installed via [component manager](main/idf_component.yml).
+This README is a leftover from the ESP-IDF Blink example. See `ESP32_C3_IOT_TEMPLATE.md` for the actual project documentation.
 
 ## How to Use Example
 
@@ -43,7 +43,7 @@ See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/l
 
 ## Example Output
 
-As you run the example, you will see the LED blinking, according to the previously defined period. For the addressable LED, you can also change the LED color by setting the `led_strip_set_pixel(led_strip, 0, 16, 16, 16);` (LED Strip, Pixel Number, Red, Green, Blue) with values from 0 to 255 in the [source file](main/blink_example_main.c).
+As you run the firmware in this repo, the onboard LED is controlled by `main/led_indicator.c` (simple GPIO patterns) and the device provides provisioning + status UI.
 
 ```text
 I (315) example: Example configured to blink addressable LED!

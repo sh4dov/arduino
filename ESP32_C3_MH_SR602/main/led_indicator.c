@@ -30,20 +30,20 @@ static void led_indicator_task(void *pvParameters) {
 
         switch (current_pattern) {
             case LED_SOLID_ON:
-                led_state = 1;
-                delay = portMAX_DELAY; // No need to wake up until pattern changes
+                led_state = 0; // Inverted logic: LOW turns LED ON
+                delay = portMAX_DELAY;
                 break;
             case LED_SOLID_OFF:
-                led_state = 0;
+                led_state = 1; // Inverted logic: HIGH turns LED OFF
                 delay = portMAX_DELAY;
                 break;
             case LED_SLOW_BLINK:
-                led_state = !led_state;
-                delay = pdMS_TO_TICKS(1000); // 1s on, 1s off
+                led_state = !led_state; // Invert current state for blinking
+                delay = pdMS_TO_TICKS(1000);
                 break;
             case LED_FAST_BLINK:
-                led_state = !led_state;
-                delay = pdMS_TO_TICKS(250); // 250ms on, 250ms off
+                led_state = !led_state; // Invert current state for blinking
+                delay = pdMS_TO_TICKS(250);
                 break;
         }
 

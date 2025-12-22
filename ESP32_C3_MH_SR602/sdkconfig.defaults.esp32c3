@@ -1,1 +1,1 @@
-CONFIG_BLINK_LED_STRIP=y
+# (Removed Blink example LED-strip option; this project uses GPIO LED via `main/led_indicator.c`.)
