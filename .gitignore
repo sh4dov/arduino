@@ -10,8 +10,6 @@ acu_driver8266/out
 FishTankLedDriver/src/pwd.h
 FishTankLedDriver2/src/pwd.h
 common/pwd.h
-test/esb_driver_idf/build/*
 test/esb_driver_idf/main/pwd.h
 test/esb_driver_esp8266_idf/main/pwd.h
-ESP32_C3_MH_SR602/build/*
-ESP32_C3_LED_SERVER/build/*
+**/build/**
